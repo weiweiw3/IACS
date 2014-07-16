@@ -1,20 +1,37 @@
 <!-- 
-  This template gets placed in the Pet tab's <ion-nav-view> directive.
+  This template gets placed in the Setting tab's <ion-nav-view> directive.
   It was wired up in the app config (app.js) 
-  The 'pets' data comes from its $scope within PetIndexCtrl (controller.js)
--->
+ -->
 <ion-view title="Setting">
+
   <ion-content>
 
     <ion-list>
-    <div ng-controller="settingCtrl">
         <ion-item type="item-text-wrap" >
-            <button ng-click="logout()" type="submit" class="button button-positive button-block">logout</button>
+            {{ auth.user.id }}
+        <a class="button icon ion-home" href="#/tab/myprofile"> more</a>
+        </ion-item>
+        <ion-item type="item-text-wrap" >
+            <div ng-show-auth="login">{{auth.user}} {{auth.user.id}} is logged in</div>
+            <div ng-show-auth="logout">Logged out</div>
+            <div ng-show-auth="error">An error occurred: {{auth.error}}</div>
+
         </ion-item>
 
-    </div>
+
+        <ion-item type="item-text-wrap" >
+            <form ng-submit="show1()">
+                <button on-swipe-left="onSwipeLeft()" class="button button-block button-positive" type="submit">show</button>
+            </form>
+        </ion-item>
+        <ion-item type="item-text-wrap" >
+            <form ng-submit="logout()">
+                <button class="button button-assertive button-block"  type="submit">logout</button>
+            </form>
+        </ion-item>
 
     </ion-list>
 
   </ion-content>
+
 </ion-view>

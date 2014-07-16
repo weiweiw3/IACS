@@ -1,24 +1,22 @@
-<ion-view title="'Login'" hide-back-button="true">
+<ion-view title="'Login'{{ logindata.email }}" hide-back-button="true">
   <ion-content has-header="true" has-tabs="true" padding="true">
-    <form ng-submit="tryLogin()">
+    <form ng-submit="trylogin()">
       <div class="list list-inset">
-
         <label class="item item-input">
-            <span class="input-label">Your email</span>
-            <input type="text" placeholder="Email" ng-model="loginData.email" >
+            <input type="text" placeholder="Email" ng-model="logindata.email" >
         </label>
         <label class="item item-input">
-          <input type="password" placeholder="Password" ng-model="loginData.password" value="w">
+            <input type="password" placeholder="Password" ng-model="logindata.pass">
         </label>
-
-        <div>
-          <button class="button button-block button-positive" type="submit">Login in</button>
-        </div>
+        <ion-toggle ng-model="logindata.remember">remember me</ion-toggle>
+      </div>
+      <button class="button button-block button-positive" type="submit">Login in</button>
+    </form>
+      <button type="submit" ng-click="createAccount()">Create Account</button>
         <!--<div style="text-align: center">-->
           <!--Or <a href="/#/signup">Create an account</a>-->
         <!--</div>-->
-      </div>
-    </form>
+
   </ion-content>
 </ion-view>
 
