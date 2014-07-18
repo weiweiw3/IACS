@@ -1,36 +1,32 @@
+// Ionic uses AngularUI Router which uses the concept of states
+// Learn more here: https://github.com/angular-ui/ui-router
+// Set up authRequired for routeSecurity-ui-router: True states which the app can be in.
+
 "use strict";
 
 angular.module('myApp.routes', [ ])
 
-    .config(['$stateProvider', '$urlRouterProvider',function($stateProvider, $urlRouterProvider) {
-
-        // Ionic uses AngularUI Router which uses the concept of states
-        // Learn more here: https://github.com/angular-ui/ui-router
-        // Set up the varimodule.routeSecurity.jsous states which the app can be in.
+    .config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
         $stateProvider
-            // setup an login page
-            .state('login', {
+            .state('login', {            // setup an login page
                 url: "/login",
                 templateUrl: "templates/login.html",
                 controller: 'LoginCtrl'
             })
 
-            // setup an abstract state for the tabs directive
-            .state('tab', {
+            .state('tab', {            // setup an abstract state for the tabs directive
                 url: "/tab",
 //                authRequired: true,
                 abstract: true,
                 templateUrl: "templates/tabs.html"
             })
 
-
-            // the pet tab has its own child nav-view and history
-            .state('tab.message-index', {
+            .state('tab.message-index', {            // the message tab has its own child nav-view and history
                 url: '/messages',
+                authRequired: true,
                 views: {
                     'messages-tab': {
                         templateUrl: 'templates/message-index.html'
-//                        controller: 'PetIndexCtrl'
                     }
                 }
             })
@@ -39,7 +35,7 @@ angular.module('myApp.routes', [ ])
                 url: '/message/:messageType',
                 views: {
                     'messages-tab': {
-                        templateUrl: 'templates/message-detail.html',
+                        templateUrl: 'templates/message-detail.html'
 //                        controller: 'PetDetailCtrl'
                     }
                 }
@@ -56,15 +52,15 @@ angular.module('myApp.routes', [ ])
                 }
             })
 
-//            .state('tab.contacts-detail', {
-//                url: '/contacts/:contactId',
-//                views: {
-//                    'contacts-tab': {
-//                        templateUrl: 'templates/contact-detail.html',
-//                        controller: 'PetDetailCtrl'
-//                    }
-//                }
-//            })
+            .state('tab.contacts-detail', {
+                url: '/contacts/:contactId',
+                views: {
+                    'contacts-tab': {
+                        templateUrl: 'templates/contact-detail.html'
+                    }
+                }
+
+            })
 
             // the components tab has its own child nav-view and history
             .state('tab.components', {
@@ -81,10 +77,8 @@ angular.module('myApp.routes', [ ])
             // the setting tab has its own child nav-view and history
             .state('tab.setting', {
                 url: '/setting',
-
                 views: {
                     'setting-tab': {
-
                         templateUrl: 'templates/setting.html',
                         controller: 'LoginCtrl'
                     }
@@ -101,22 +95,16 @@ angular.module('myApp.routes', [ ])
             })
         ;
 
-//        // if none of the above states are matched, use this as the fallback
-//        $urlRouterProvider.otherwise('/tab/pets');
-
+        // if none of the above states are matched, use this as the fallback
         //isAuthenticated is set below in the .run() command
         $urlRouterProvider.otherwise(
-//        isAuthenticated ?  '/login' : '/tab/pets'
             function () {
                 if (isAuthenticated) {
-                    return '/tab/setting'
+                    return '/tab/messages'
                 } else {
                     return '/login'
                 }
             }
         );
-
-
     }
-])
-;
+    ]);

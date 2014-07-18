@@ -1,6 +1,6 @@
 //**copy from firereader
 
-(function(angular) {
+(function (angular) {
     "use strict";
     var appServices = angular.module('myApp.services', ['myApp.utils', 'firebase', 'firebase.utils']);
 
@@ -32,14 +32,16 @@
 
         // key and possibly options given, get cookie...
         options = value || {};
-        var result, decode = options.raw ? function (s) { return s; } : decodeURIComponent;
+        var result, decode = options.raw ? function (s) {
+            return s;
+        } : decodeURIComponent;
         return (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? decode(result[1]) : null;
     }
 
     /**
      * A utility to store variables in local storage, with a fallback to cookies if localStorage isn't supported.
      */
-    appServices.factory('localStorage', ['$log', function($log) {
+    appServices.factory('localStorage', ['$log', function ($log) {
         //todo should handle booleans and integers more intelligently?
         var loc = {
             /**
@@ -47,17 +49,17 @@
              * @param value  objects are converted to json strings, undefined is converted to null (removed)
              * @returns {localStorage}
              */
-            set: function(key, value) {
+            set: function (key, value) {
 //               $log.debug('localStorage.set', key, value);
                 var undefined;
-                if( value === undefined || value === null ) {
+                if (value === undefined || value === null) {
                     // storing a null value returns "null" (a string) when get is called later
                     // so to make it actually null, just remove it, which returns null
                     loc.remove(key);
                 }
                 else {
                     value = angular.toJson(value);
-                    if( typeof(localStorage) === 'undefined' ) {
+                    if (typeof(localStorage) === 'undefined') {
                         cookie(key, value);
                     }
                     else {
@@ -70,9 +72,9 @@
              * @param {string} key
              * @returns {*} the value or null if not found
              */
-            get: function(key) {
+            get: function (key) {
                 var v = null;
-                if( typeof(localStorage) === 'undefined' ) {
+                if (typeof(localStorage) === 'undefined') {
                     v = cookie(key);
                 }
                 else {
@@ -85,8 +87,8 @@
              * @param {string} key
              * @returns {localStorage}
              */
-            remove: function(key) {
-                if( typeof(localStorage) === 'undefined' ) {
+            remove: function (key) {
+                if (typeof(localStorage) === 'undefined') {
                     cookie(key, null);
                 }
                 else {
@@ -97,7 +99,7 @@
         };
 
         //debug just a temporary tool for debugging and testing
-        angular.resetLocalStorage = function() {
+        angular.resetLocalStorage = function () {
             $log.info('resetting localStorage values');
             _.each(['authUser', 'authProvider', 'sortBy'], loc.remove);
         };
@@ -105,263 +107,262 @@
         return loc;
     }]);
 
-    appServices.factory('updateScope', ['$timeout', '$parse', function($timeout, $parse) {
-        return function(scope, name, val, cb) {
-            $timeout(function() {
+    appServices.factory('updateScope', ['$timeout', '$parse', function ($timeout, $parse) {
+        return function (scope, name, val, cb) {
+            $timeout(function () {
                 $parse(name).assign(scope, val);
                 cb && cb();
             });
         }
     }]);
 
-     /**
+    /**
      * A simple utility to monitor changes to authentication and set some values in scope for use in bindings/directives/etc
      */
     appServices.factory('authScopeUtil', ['$log', 'updateScope', 'localStorage', '$location',
-        function($log, updateScope, localStorage, $location) {
-        return function($scope) {
-            $scope.auth_min = {
-                authenticated: false,
-                user: null,
-                name: null,
-                provider: localStorage.get('authProvider')
-            };
-
-            $scope.$on('$firebaseSimpleLogin:login', _loggedIn);
-            $scope.$on('$firebaseSimpleLogin:error', function(err) {
-                $log.error(err);
-                _loggedOut();
-            });
-            $scope.$on('$firebaseSimpleLogin:logout', _loggedOut);
-
-            function parseName(user) {
-                switch(user.provider) {
-                    case 'persona':
-                        return (user.id||'').replace(',', '.');
-                    default:
-                        return user.id;
-                }
-            }
-
-            function _loggedIn(evt, user) {
-                localStorage.set('authProvider', user.provider);
-                $scope.auth_min = {
-                    authenticated: true,
-                    user: user.id,
-                    name: parseName(user),
-                    provider: user.provider
-                };
-                updateScope($scope, 'auth_min', $scope.auth_min, function() {
-                    if( !($location.path()||'').match('/hearth') ) {
-                        $location.path('/hearth');
-                    }
-                });
-            }
-
-            function _loggedOut() {
+        function ($log, updateScope, localStorage, $location) {
+            return function ($scope) {
                 $scope.auth_min = {
                     authenticated: false,
                     user: null,
                     name: null,
-                    provider: $scope.auth_min && $scope.auth_min.provider
+                    provider: localStorage.get('authProvider')
                 };
-                updateScope($scope, 'auth_min', $scope.auth_min, function() {
-                    $location.search('feed', null);
-                    $location.path('/demo');
+
+                $scope.$on('$firebaseSimpleLogin:login', _loggedIn);
+                $scope.$on('$firebaseSimpleLogin:error', function (err) {
+                    $log.error(err);
+                    _loggedOut();
                 });
+                $scope.$on('$firebaseSimpleLogin:logout', _loggedOut);
+
+                function parseName(user) {
+                    switch (user.provider) {
+                        case 'persona':
+                            return (user.id || '').replace(',', '.');
+                        default:
+                            return user.id;
+                    }
+                }
+
+                function _loggedIn(evt, user) {
+                    localStorage.set('authProvider', user.provider);
+                    $scope.auth_min = {
+                        authenticated: true,
+                        user: user.id,
+                        name: parseName(user),
+                        provider: user.provider
+                    };
+                    updateScope($scope, 'auth_min', $scope.auth_min, function () {
+                        if (!($location.path() || '').match('/hearth')) {
+                            $location.path('/hearth');
+                        }
+                    });
+                }
+
+                function _loggedOut() {
+                    $scope.auth_min = {
+                        authenticated: false,
+                        user: null,
+                        name: null,
+                        provider: $scope.auth_min && $scope.auth_min.provider
+                    };
+                    updateScope($scope, 'auth_min', $scope.auth_min, function () {
+                        $location.search('feed', null);
+                        $location.path('/demo');
+                    });
+                }
             }
-        }
-    }]);
+        }]);
 
     /**
      * Some straightforward scope methods for dealing with feeds and articles; these have no dependencies
      */
-    appServices.factory('feedScopeUtils', ['localStorage', '$timeout', '$location', function (localStorage, $timeout, $location) {
-        return function ($scope, feedMgr) {
-            $scope.showRead = false;
-            $scope.feedName = feedMgr.feedName.bind(feedMgr);
-            $scope.feeds = feedMgr.getFeeds();
-            $scope.articles = feedMgr.getArticles();
-            $scope.counts = feedMgr.articleManager.counts;
-            $scope.feedChoices = feedMgr.getChoices();
+    appServices.factory('feedScopeUtils', ['localStorage', '$timeout', '$location',
+        function (localStorage, $timeout, $location) {
+            return function ($scope, feedMgr) {
+                $scope.showRead = false;
+                $scope.feedName = feedMgr.feedName.bind(feedMgr);
+                $scope.feeds = feedMgr.getFeeds();
+                $scope.articles = feedMgr.getArticles();
+                $scope.counts = feedMgr.articleManager.counts;
+                $scope.feedChoices = feedMgr.getChoices();
 
-            $scope.feeds.$on('change', function() {
-                $scope.noFeeds = $scope.feeds.$getIndex().length === 0;
-            });
+                $scope.feeds.$on('change', function () {
+                    $scope.noFeeds = $scope.feeds.$getIndex().length === 0;
+                });
 
-            //todo snag this from $location?
-            $scope.link = $scope.isDemo ? 'demo' : 'hearth';
+                //todo snag this from $location?
+                $scope.link = $scope.isDemo ? 'demo' : 'hearth';
 
-            $scope.isActive = function (feedId) {
-                return $scope.activeFeed === feedId;
-            };
+                $scope.isActive = function (feedId) {
+                    return $scope.activeFeed === feedId;
+                };
 
-            $scope.showAllFeeds = function () {
-                return !$scope.activeFeed;
-            };
+                $scope.showAllFeeds = function () {
+                    return !$scope.activeFeed;
+                };
 
-            $scope.openFeedBuilder = function ($event) {
-                $event && $event.preventDefault();
-                $scope.$broadcast('modal:customFeed');
-            };
+                $scope.openFeedBuilder = function ($event) {
+                    $event && $event.preventDefault();
+                    $scope.$broadcast('modal:customFeed');
+                };
 
-            $scope.openArticle = function (article, $event) {
-                if ($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-                }
-                $scope.$broadcast('modal:article', article);
-            };
-
-            $scope.filterMethod = function (article) {
-                return passesFilter(article) && notRead(article) && activeFeed(article);
-            };
-
-            $scope.orderMethod = function (article) {
-                var v = article[$scope.sortField];
-                return $scope.sortDesc ? 0 - parseInt(v) : parseInt(v);
-            };
-
-            $scope.markArticleRead = function (article, $event, noSave) {
-                if ($scope.isDemo) {
-                    return;
-                }
-                if ($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-                }
-                var f = article.$feed;
-                if (!_.has($scope.readArticles, f)) {
-                    $scope.readArticles[f] = {};
-                }
-                $scope.readArticles[f][article.$id] = Date.now();
-                noSave || $scope.readArticles.$save(f);
-            };
-
-            $scope.markFeedRead = function (feedId, $event) {
-                if ($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-                }
-                angular.forEach($scope.articles, function(article) {
-                    if (article.$feed === feedId) {
-                        $scope.markArticleRead(article, null, true);
+                $scope.openArticle = function (article, $event) {
+                    if ($event) {
+                        $event.preventDefault();
+                        $event.stopPropagation();
                     }
-                });
-                $scope.counts[feedId] = 0;
-                $scope.readArticles.$save();
-            };
+                    $scope.$broadcast('modal:article', article);
+                };
 
-            $scope.markAllFeedsRead = function ($event) {
-                if ($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-                }
-                angular.forEach($scope.feeds, function (feed) {
-                    $scope.markFeedRead(feed.$id, $event);
-                });
-            };
+                $scope.filterMethod = function (article) {
+                    return passesFilter(article) && notRead(article) && activeFeed(article);
+                };
 
-            $scope.noVisibleArticles = function () {
-                return !$scope.loading && !$scope.noFeeds && countActiveArticles() === 0;
-            };
+                $scope.orderMethod = function (article) {
+                    var v = article[$scope.sortField];
+                    return $scope.sortDesc ? 0 - parseInt(v) : parseInt(v);
+                };
 
-            var to;
-            $scope.startLoading = function () {
-                $scope.loading = true;
-                to && $timeout.cancel(to);
-                to = $timeout(function () {
-                    $scope.loading = false;
-                }, 4000);
-                return to;
-            };
+                $scope.markArticleRead = function (article, $event, noSave) {
 
-            $scope.stopLoading = function () {
-                to && $timeout.cancel(to);
-                to = null;
-                if ($scope.loading) {
-                    $timeout(function () {
+                    if ($event) {
+                        $event.preventDefault();
+                        $event.stopPropagation();
+                    }
+                    var f = article.$feed;
+                    if (!_.has($scope.readArticles, f)) {
+                        $scope.readArticles[f] = {};
+                    }
+                    $scope.readArticles[f][article.$id] = Date.now();
+                    noSave || $scope.readArticles.$save(f);
+                };
+
+                $scope.markFeedRead = function (feedId, $event) {
+                    if ($event) {
+                        $event.preventDefault();
+                        $event.stopPropagation();
+                    }
+                    angular.forEach($scope.articles, function (article) {
+                        if (article.$feed === feedId) {
+                            $scope.markArticleRead(article, null, true);
+                        }
+                    });
+                    $scope.counts[feedId] = 0;
+                    $scope.readArticles.$save();
+                };
+
+                $scope.markAllFeedsRead = function ($event) {
+                    if ($event) {
+                        $event.preventDefault();
+                        $event.stopPropagation();
+                    }
+                    angular.forEach($scope.feeds, function (feed) {
+                        $scope.markFeedRead(feed.$id, $event);
+                    });
+                };
+
+                $scope.noVisibleArticles = function () {
+                    return !$scope.loading && !$scope.noFeeds && countActiveArticles() === 0;
+                };
+
+                var to;
+                $scope.startLoading = function () {
+                    $scope.loading = true;
+                    to && $timeout.cancel(to);
+                    to = $timeout(function () {
                         $scope.loading = false;
+                    }, 4000);
+                    return to;
+                };
+
+                $scope.stopLoading = function () {
+                    to && $timeout.cancel(to);
+                    to = null;
+                    if ($scope.loading) {
+                        $timeout(function () {
+                            $scope.loading = false;
+                        });
+                    }
+                };
+
+                $scope.sortField = 'date';
+
+                $scope.$watch('sortDesc', function () {
+                    //todo store in firebase
+                    localStorage.set('sortDesc', $scope.sortDesc);
+                });
+
+                $scope.sortDesc = !!localStorage.get('sortDesc');
+
+                function passesFilter(article) {
+                    if (_.isEmpty($scope.articleFilter)) {
+                        return true;
+                    }
+                    var txt = ($scope.articleFilter || '').toLowerCase();
+                    return _.find(article, function (v, k) {
+                        return !!(v && (v + '').toLowerCase().indexOf(txt) >= 0);
                     });
                 }
-            };
 
-            $scope.sortField = 'date';
-
-            $scope.$watch('sortDesc', function () {
-                //todo store in firebase
-                localStorage.set('sortDesc', $scope.sortDesc);
-            });
-
-            $scope.sortDesc = !!localStorage.get('sortDesc');
-
-            function passesFilter(article) {
-                if (_.isEmpty($scope.articleFilter)) {
-                    return true;
+                function notRead(article) {
+                    return $scope.showRead || !$scope.readArticles || !_.has($scope.readArticles, article.$feed) || !_.has($scope.readArticles[article.$feed], article.$id);
                 }
-                var txt = ($scope.articleFilter || '').toLowerCase();
-                return _.find(article, function (v, k) {
-                    return !!(v && (v + '').toLowerCase().indexOf(txt) >= 0);
+
+                function activeFeed(article) {
+                    return !$scope.activeFeed || $scope.activeFeed === article.$feed;
+                }
+
+                function countActiveArticles() {
+                    if ($scope.activeFeed) {
+                        return $scope.counts[$scope.activeFeed] || 0;
+                    }
+                    else {
+                        return _.reduce($scope.counts, function (memo, num) {
+                            return memo + num;
+                        }, 0);
+                    }
+                }
+
+                $scope.feeds.$on('loaded', checkSearchPath);
+                $scope.feeds.$on('child_removed', checkSearchPath);
+                function checkSearchPath() {
+                    // if a feed is currently selected and that feed does not exist anymore
+                    // then clear the selection
+                    var feed = ($location.search() || {}).feed;
+                    if (feed && !($scope.feeds || {})[feed]) {
+                        $location.replace();
+                        $location.search('feed', null);
+                    }
+                }
+
+                $scope.startLoading();
+                $scope.feeds.$on('loaded', function () {
+                    $scope.stopLoading();
                 });
             }
+        }]);
 
-            function notRead(article) {
-                return $scope.showRead || !$scope.readArticles || !_.has($scope.readArticles, article.$feed) || !_.has($scope.readArticles[article.$feed], article.$id);
-            }
-
-            function activeFeed(article) {
-                return !$scope.activeFeed || $scope.activeFeed === article.$feed;
-            }
-
-            function countActiveArticles() {
-                if ($scope.activeFeed) {
-                    return $scope.counts[$scope.activeFeed] || 0;
-                }
-                else {
-                    return _.reduce($scope.counts, function (memo, num) {
-                        return memo + num;
-                    }, 0);
-                }
-            }
-
-            $scope.feeds.$on('loaded', checkSearchPath);
-            $scope.feeds.$on('child_removed', checkSearchPath);
-            function checkSearchPath() {
-                // if a feed is currently selected and that feed does not exist anymore
-                // then clear the selection
-                var feed = ($location.search() || {}).feed;
-                if (feed && !($scope.feeds || {})[feed]) {
-                    $location.replace();
-                    $location.search('feed', null);
-                }
-            }
-
-            $scope.startLoading();
-            $scope.feeds.$on('loaded', function() {
-                $scope.stopLoading();
-            });
-        }
-    }]);
-
-    appServices.factory('disposeOnLogout', ['$rootScope', function($rootScope) {
+    appServices.factory('disposeOnLogout', ['$rootScope', function ($rootScope) {
         var disposables = [];
 
-        $rootScope.$on('authManager:beforeLogout', function() {
-            angular.forEach(disposables, function(fn) {
+        $rootScope.$on('authManager:beforeLogout', function () {
+            angular.forEach(disposables, function (fn) {
                 fn();
             });
             disposables = [];
         });
 
-        return function(fnOrRef, event, callback) {
+        return function (fnOrRef, event, callback) {
             var fn;
-            if( arguments.length === 3 ) {
-                fn = function() {
+            if (arguments.length === 3) {
+                fn = function () {
                     fnOrRef.off(event, callback);
                 }
             }
-            else if( angular.isObject(fnOrRef) && fnOrRef.hasOwnProperty('$off') ) {
-                fn = function() {
+            else if (angular.isObject(fnOrRef) && fnOrRef.hasOwnProperty('$off')) {
+                fn = function () {
                     fnOrRef.$off();
                 }
             }

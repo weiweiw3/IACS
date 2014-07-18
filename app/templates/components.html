@@ -5,37 +5,27 @@
 -->
 <ion-view title="Components">
     <ion-content>
-            <div ng-controller="ActionSheetCtrl" >
-                <div class="button button-assertive button-block" ng-click="takeAction()">
-                    Take Action!
+        <div ng-controller="ActionSheetCtrl">
+            <div class="button button-assertive button-block" ng-click="takeAction()">
+                Take Action!
+            </div>
+            <div class="card" ng-show="messages.length">
+                <div class="item item-divider">
+                    User Log
                 </div>
-                <div class="card" ng-show="messages.length">
-                    <div class="item item-divider">
-                        User Log
-                    </div>
-                    <div class="item item-text-wrap">
-                        <div ng-repeat="message in messages">
-                            {{message.text}}
-                        </div>
+                <div class="item item-text-wrap">
+                    <div ng-repeat="message in messages">
+                        {{message.text}}
                     </div>
                 </div>
             </div>
-            <div ng-controller="ForeverCtrl">
-             <ion-checkbox ng-repeat="(feedId,feed) in feedChoices | filter:feedChoiceFilter | orderBy:feed.title" ng-model="feed.description" ng-click="addFeed(feedId)">
-                    {{feed.title}} {{ feedId }}
-             </ion-checkbox>
-
-                <ion-list>
-                    <ion-item ng-repeat="(feedId,feed) in feedChoices | filter:feedChoiceFilter | orderBy:feed.title">
-                        <a title="{{feed.description}}" ng-click="addFeed(feedId)">
-                            {{feed.title}}
-                        </a>
-                    </ion-item>
-                </ion-list>
-                <ion-infinite-scroll on-infinite="loadMoreItems()" icon="ion-loading-c">
-                </ion-infinite-scroll>
-            </div>
-
+        </div>
+        <div ng-controller="ForeverCtrl">
+            <ion-checkbox ng-repeat="(feedId,feed) in feedChoices | filter:feedChoiceFilter | orderBy:feed.title"
+                          ng-model="feed.description" ng-click="addFeed(feedId)">
+                {{ feedId }}
+            </ion-checkbox>
+        </div>
 
 
     </ion-content>
