@@ -31,16 +31,16 @@ angular.module('myApp.routes', [ ])
                 }
             })
 
-            .state('tab.message-detail', {
-                url: '/message/:messageType',
-                views: {
-                    'messages-tab': {
-                        templateUrl: 'templates/message-detail.html'
-//                        controller: 'PetDetailCtrl'
-                    }
-                }
-            })
+            .state('message-detail', {
+                url: '/message/:component',
+                templateUrl: 'templates/message-detail.html'
 
+            })
+            .state('message', {
+                url: '/message',
+                templateUrl: 'templates/message.html'
+
+            })
             // the contacts tab has its own child nav-view and history
             .state('tab.contacts', {
                 url: '/contacts',

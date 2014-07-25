@@ -34,7 +34,21 @@ angular.module('firebase.utils', ['firebase'])
             return $firebase(ref);
         }
     }])
-
+    .factory('syncDataSE', ['$firebase', 'firebaseRef', function ($firebase, firebaseRef) {
+        /**
+         * @function
+         * @name syncData
+         * @param {String|Array...} path
+         * @param {int} [limit]
+         * @param {String} startAt
+         * @return a Firebase instance
+         */
+        return function (path, limit) {
+            var ref = firebaseRef(path);
+            limit && (ref = ref.endAt('q','002').limit(limit));
+            return $firebase(ref);
+        }
+    }])
     .factory('encodeFirebaseKey', function () {
         return function (string) {
             return (string || '').replace(/([.$\[\]#\/])/g, function (m, p1) {

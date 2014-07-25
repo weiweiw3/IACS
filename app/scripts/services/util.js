@@ -42,5 +42,11 @@
                 return new Firebase(path).endAt().limit(250);
             }
         }]);
+//————————————————————
+    appUtils.factory('profileUrl', ['firebaseRef', function (firebaseRef) {
+        return function () {
 
+            return firebaseRef('users',$rootScope.auth_min.user, 'profile');
+        }
+    }]);
 })(angular);

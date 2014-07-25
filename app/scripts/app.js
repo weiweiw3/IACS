@@ -6,7 +6,6 @@ var dependencyModules = [
     'angularFireAggregate',
     'firebase.simpleLoginTools',
     'firebase',
-
     'ionic' ];
 var myAppComponents = [
     'myApp.utils',
@@ -17,11 +16,13 @@ var myAppComponents = [
     'myApp.services',
 //  'appServices',
     'myApp.directives',
-
+    'myApp.controllers.setting',
     'myApp.controllers.contacts',
     'myApp.controllers.chatRoom',
     'myApp.controller.ionic',
-    'myApp.controllers.feedManage'
+    'myApp.controllers.feedManage',
+    'myApp.controllers.messages',
+    'myApp.services.ionic'
 ];
 
 // Declare app level module which depends on filters, and services

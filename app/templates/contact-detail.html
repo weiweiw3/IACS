@@ -1,5 +1,14 @@
-<ion-view title="Contact-detail">
-    <div class="list">
+<ion-view title="Contact Detail" >
+    <ion-content class="padding" ng-controller="contactDetailCtrl">
+        <label >
+            <span class="input-label">{{ contactDetail.first_name }} {{ contactDetail.last_name }}</span>
+
+        </label>
+        <label class="item item-input">
+            <span class="input-label">Alias</span>
+            <input type="text" ng-model="contactDetail.alias">
+        </label>
+        <ion-toggle ng-model="contactDetail.favorite">favorite</ion-toggle>
 
         <a class="item item-icon-left" href="#">
             <i class="icon ion-email"></i>
@@ -25,6 +34,8 @@
             Friends
             <span class="badge badge-assertive">12</span>
         </a>
+    </ion-content>
 
-    </div>
+
+
 </ion-view>

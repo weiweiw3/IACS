@@ -175,7 +175,7 @@ angular.module('myApp.controllers.feedManage', ['myApp.utils', 'fr.feedManager']
 
             $scope.tryLogin = function (cb) {
 
-                var promise = function () {
+                function _f() {
                     var error = null;
                     var deferred = $q.defer();
                     $ionicLoading.show({
@@ -196,7 +196,8 @@ angular.module('myApp.controllers.feedManage', ['myApp.utils', 'fr.feedManager']
                             }
                         });
                     return deferred.promise;
-                };
+                }
+                var promise =_f();
                 promise.then(function (update) {
                     console.log('Success: ' + update);
                     $ionicLoading.hide();

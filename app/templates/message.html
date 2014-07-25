@@ -1,0 +1,32 @@
+
+<div ng-controller="messageDetailCtrl">
+    <div class="bar bar-header">
+        <a class="button icon ion-navicon" href="#/tab/messages"> </a>
+        <h1 class="title">{{ message.title }}</h1>
+        <button class="button">Edit</button>
+    </div>
+
+    <ion-content>
+        <ion-list>
+
+            <ion-item type="item-text-wrap">
+
+                <h3>{{ 'status:' + message.status}}
+                    + {{message.last | date:"MM/dd/yyyy @ h:mma" }}</h3>
+            </ion-item>
+            <ion-item type="item-text-wrap">
+                {{ 'fromUser:' + message.fromUser}}
+                <nav-contact user=13>
+                </nav-contact >
+            </ion-item>
+            <ion-item type="item-text-wrap">
+                {{ 'toUser:' + message.toUser}}
+                <nav-contact user="message.toUser">
+                </nav-contact >
+
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</div>
+
+
