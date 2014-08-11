@@ -4,7 +4,8 @@ angular.module('myApp.controllers.contacts', [ ])
     /*triple data binding*/
     $scope.syncContactDetail = function() {
         syncData(['users',$rootScope.auth_min.user, 'peers',$stateParams.contactId])
-            .$bind($scope, 'contactDetail')
+            .$asObject()
+            .$bindTo($scope, 'contactDetail')
             .then(function(unBind) {
                 $scope.unBindProfile = unBind;
             });
@@ -20,28 +21,30 @@ angular.module('myApp.controllers.contacts', [ ])
 
 
 })
-    .controller('ContactsCtrl', function (syncData, $scope, articleFactory, $rootScope, $ionicScrollDelegate, $http, $ionicLoading) {
+    .controller('ContactsCtrl', function (syncData, $scope, articleFactory,
+                                          $rootScope, $ionicScrollDelegate, ionicLoading) {
         var contacts = $scope.contacts = [];
-
-        function syncContacts() {
-        }
-        var CONTACT = [];
-        var contactsRef = syncData(['users', $rootScope.auth_min.user]);
-        angular.forEach(contactsRef.peers, function (person) {
-            CONTACT.push(person);
-        });
         var contactsFavorite = [];
-        contactsFavorite.push({
-            isLetter: true,
-            letter: 'Favorites'
-        });
         var contactsUnfavorite = [];
         var currentCharCode = 'A'.charCodeAt(0) - 1;
-        CONTACT
-            .sort(function (a, b) {
-                return a.last_name > b.last_name ? 1 : -1;
-            })
-            .forEach(function (person) {
+        function syncContacts() {
+        }
+        var CONTACT = syncData(['users', $rootScope.auth_min.user,'peers']).$asArray();
+
+        function orderName(){
+            contactsFavorite = [];
+            contactsUnfavorite = [];
+            currentCharCode = 'A'.charCodeAt(0) - 1;
+            contactsFavorite.push({
+                isLetter: true,
+                letter: 'Favorites'
+            });
+
+            CONTACT
+                .sort(function (a, b) {
+                    return a.last_name > b.last_name ? 1 : -1;
+                })
+                .forEach(function (person) {
                     //Get the first letter of the last name, and if the last name changes
                     //put the letter in the array
                     var personCharCode = person.last_name.toUpperCase().charCodeAt(0);
@@ -57,17 +60,29 @@ angular.module('myApp.controllers.contacts', [ ])
                     } else {
                         contactsUnfavorite.push(person);
                     }
-            });
+                });
 
-        contacts = contactsFavorite.concat(contactsUnfavorite);
-
-        //If names ended before Z, add everything up to Z
-        for (var i = currentCharCode + 1; i <= 'Z'.charCodeAt(0); i++) {
-            addLetter(i);
+            //If names ended before Z, add everything up to Z
+            for (var i = currentCharCode + 1; i <= 'Z'.charCodeAt(0); i++) {
+                addLetter(i);
+            }
+            contacts = contactsFavorite.concat(contactsUnfavorite);
         }
+        ionicLoading.load();
 
+        CONTACT.$loaded().then(
+            function(){
+                orderName();
+                ionicLoading.unload();
+            }
+        );
+        CONTACT.$watch(function(event) {
+            orderName();
+//            console.log(event);
+        });
         function addLetter(code) {
             var letter = String.fromCharCode(code);
+
             contactsUnfavorite.push({
                 isLetter: true,
                 letter: letter
@@ -77,7 +92,7 @@ angular.module('myApp.controllers.contacts', [ ])
 
         //Letters are shorter, everything else is 100 pixels
         $scope.getItemHeight = function (item) {
-            return item.isLetter ? 40 : 100;
+            return item.isLetter ? 30 : 60;
         };
 
         $scope.scrollBottom = function () {
@@ -98,10 +113,6 @@ angular.module('myApp.controllers.contacts', [ ])
                 var itemDoesMatch = !$scope.search || item.isLetter ||
                     item.first_name.toLowerCase().indexOf($scope.search.toLowerCase()) > -1 ||
                     item.last_name.toLowerCase().indexOf($scope.search.toLowerCase()) > -1 ;
-
-
-
-
                 //Mark this person's last name letter as 'has a match'
                 if (!item.isLetter && itemDoesMatch && !item.favorite) {
                     var letter = item.last_name.charAt(0).toUpperCase();

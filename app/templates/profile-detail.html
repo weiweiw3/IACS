@@ -14,10 +14,8 @@
             <div class="input-label">
                 Lightsaber
             </div>
-            <select ng-model="profile.b">
-                <option>Blue</option>
-                <option selected>{{ profile.b }}</option>
-                <option>Red</option>
+            <select ng-model="profile.b" ng-options="item for item in items">
+
             </select>
         </label>
 

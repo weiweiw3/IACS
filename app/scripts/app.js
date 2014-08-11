@@ -6,7 +6,8 @@ var dependencyModules = [
     'angularFireAggregate',
     'firebase.simpleLoginTools',
     'firebase',
-    'ionic' ];
+    'ionic',
+    'angular-momentjs'];
 var myAppComponents = [
     'myApp.utils',
     'myApp.routes',

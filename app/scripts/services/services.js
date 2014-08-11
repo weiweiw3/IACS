@@ -4,6 +4,164 @@
     "use strict";
     var appServices = angular.module('myApp.services', ['myApp.utils', 'firebase', 'firebase.utils']);
 
+    appServices.factory('myProfileService', ['$FirebaseObject', '$rootScope', function ($FirebaseObject, $rootScope) {
+
+    }]);
+    appServices.factory('myPeerService',
+        function ($timeout, $q, $firebase, $rootScope, firebaseRef) {
+//            var currentUser = $rootScope.auth_min.user;
+            var currentUser = '12';
+            var myContactRef = firebaseRef(['users', currentUser, 'peers']);
+            var PublicRef = firebaseRef(['peers']);
+            var sync = $firebase(myContactRef);
+
+            var myContacts = {
+                ref: myContactRef,
+                all: sync,
+                findContact: function (opt, contactId) {
+                    var result;
+                    console.log(contactId);
+                    myContactRef.once('value', function (snap) {
+                        if (snap.hasChild(contactId) == true) {
+                            result = true;
+                        } else {
+                            result = false;
+                        }
+                        opt.pass(result);
+                    });
+
+                },
+                addContact: function (opt, contactId) {
+                    var cb = opt.callback || function () {
+                    };
+                    var newPeer;
+                    var errorFn = function (err) {
+                        $timeout(function () {
+                            cb(err);
+                        });
+                    };
+                    //promise process
+                    isContact()
+                        .then(findPublicContact)
+                        .then(addIntoMyContacts)
+                        // success
+                        .then(function () {
+                            cb && cb(null)
+                        }, cb)
+                        .catch(errorFn);
+
+                    function isContact() {//if existed, reject
+                        var d = $q.defer();
+                        myContactRef.once('value', function (snap) {
+                            if (snap.hasChild(contactId) == true) {
+                                d.reject();
+                            } else {
+                                d.resolve();
+                            }
+                        });
+                        return d.promise;
+                    }
+
+                    function findPublicContact() {
+                        var d = $q.defer();
+
+                        PublicRef.child(contactId).once('value',
+                            function (snap) {
+                                newPeer = snap.val();
+                                d.resolve();
+                            },
+                            function (err) {
+                                d.reject(err);
+                            });
+                        return d.promise;
+                    }
+
+                    function addIntoMyContacts() {
+                        var d = $q.defer();
+                        var ref = myContactRef.child(contactId);
+                        var sync = $firebase(ref);
+                        var id;
+
+                        sync.$set(newPeer).then(function (ref) {
+                                opt.pass(true);//set scope.pass as pass
+                                d.resolve();
+                            },
+                            function (err) {
+                                opt.pass(false);
+                                d.reject(err);
+                            });
+                        return d.promise;
+                    }
+                }
+
+            };
+            return myContacts;
+        });
+    appServices.factory('myMessageService', ['$rootScope', 'syncData',
+        function ($rootScope, syncData) {
+
+            var ref = syncData(['users', $rootScope.auth_min.user, 'messages']);
+            var myMessages = {
+                array: ref.$asArray(),
+                object: ref.$asObject(),
+                findMessageByComponent: function (componentId) {
+                    var ref = syncData(['users', $rootScope.auth_min.user, 'messages', componentId]);
+                    return ref;
+                },
+                findMessageById: function (componentId, messageId) {
+                    var ref = syncData(['users', $rootScope.auth_min.user, 'messages', componentId, messageId])
+                        .$asObject();
+                    return ref;
+                },
+                messageFavorite: function (componentId, messageId) {
+                    var ref = syncData(['users', $rootScope.auth_min.user,
+                        'messages', componentId, messageId, 'favorite'])
+                        .$asObject();
+                    return ref;
+                },
+                saveMessageFavorite: function (componentId, messageId) {
+                    var obj = this.messageFavorite(componentId, messageId);
+                    obj.$save().then(function () {
+                        console.log(obj.$id);
+                    });
+                }
+            };
+            return myMessages;
+        }]);
+
+    appServices.factory('myComponentService', ['$rootScope', 'syncData',
+        function ($rootScope, syncData) {
+
+            var ref = syncData(['users', $rootScope.auth_min.user, 'components']);
+            var myComponent = {
+                all: ref,
+                array: ref.$asArray(),
+                object: ref.$asObject(),
+                findComponent: function (componentId) {
+                    return syncData(['users', $rootScope.auth_min.user,
+                        'components', componentId]);
+                },
+                UnreadCountMinus: function (componentId) {
+                    var ref = syncData(['users', $rootScope.auth_min.user,
+                        'components', componentId, 'unreadCount']);
+                    ref.$transaction(function (currentCount) {
+                        if (!currentCount) return 1;   // Initial value for counter.
+                        if (currentCount < 0) return;  // Return undefined to abort transaction.
+                        return currentCount - 1;             // Increment the count by 1.
+                    }).then(function (snapshot) {
+                        if (!snapshot) {
+                            // Handle aborted transaction.
+                        } else {
+                            // Do something.
+                        }
+                    }, function (err) {
+                        // Handle the error condition.c
+                    });
+                }
+
+            };
+            return myComponent;
+        }]);
     function cookie(key, value, options) {
         // key and at least value given, set cookie...
         if (arguments.length > 1 && String(value) !== "[object Object]") {
