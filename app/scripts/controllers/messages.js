@@ -1,77 +1,121 @@
 angular.module('myApp.controllers.messages', [])
 
-    .directive('navContact',function($rootScope,syncData,ionicLoading){
-        var contactRef = syncData(['users','12',
-            'peers']);
-//        contactRef.$on('loaded');
-//        contactRef.$off('loaded');
-        // Stops synchronization completely.
-//        function stopSync() {
-//            contactRef.$off();
-//        }
-        function isPeer(contactId ){
+    .directive('favoriteMessage', function ($rootScope, myMessageService, $animate) {
+        return {
+            restrict: "EA",
+            scope: {
+                component: "=component",
+                messageId: "=messageId"
+            },
 
-            var result = contactRef[contactId];
-//            var result = contactRef['13'];
-            console.log(contactId,contactRef,result);
-//            stopSync();
-            if (angular.isUndefined(result) || result == null){
-                return false
-            } else {
-                return true
+            replace: true,
+
+            link: function ($scope, element, attrs) {
+                var favorite = myMessageService.messageFavorite($scope.component, $scope.messageId);
+
+                function toggleFavorite(isFavorite) {
+                    if (isFavorite) {
+                        $animate.removeClass(element, 'button button-icon  icon ion-ios7-star-outline');
+                        $animate.addClass(element, 'button button-icon  icon ion-ios7-star');
+                    } else {
+                        $animate.removeClass(element, 'button button-icon  icon ion-ios7-star');
+                        $animate.addClass(element, 'button button-icon  icon ion-ios7-star-outline');
+                    }
+                }
+
+                favorite.$loaded().then(function () {
+
+                    toggleFavorite(favorite.$value);
+                });
+                element.on('click', function () {
+                    favorite.$value = !favorite.$value;
+                    favorite.$save().then(
+                        toggleFavorite(favorite.$value)
+                    );
+
+                });
+
             }
-        }
+        };
+    })
+    .directive('addContact', function ($rootScope, myPeerService, $q, ionicLoading, $animate) {
+
         return {
             restrict: "E",
             scope: {
-                contact:"=user"
-                // Use @ for One Way Text Binding
-                // Use = for Two Way Binding
-                // Use & to Execute Functions in the Parent Scope
+                contactId: "="// Use @ for One Way Text Binding;Use = for Two Way Binding;Use & to Execute Functions in the Parent Scope
             },
-            controller: function ($scope,$rootScope) {
+            controller: function ($scope) {
+
                 ionicLoading.load();
-                $scope.currentUser = $rootScope.auth_min.user;
-                $scope.addContact = function(text){
-                    console.log(text);
-                };
+//                $scope.isContact = true;
+                $scope.$watch('contactId', function (newVal) {
 
-
-
-//                function findContact(contact) {
-//                    return contactRef.$child(contact);
-//                }
-//                findContact($scope.contact);
-//                .then(function (snapshot) {
-//                    if (!snapshot) {
-//                        // Handle aborted transaction.
-//                    } else {
-//                        // Do something.
-//                    }
-//                }, function (err) {
-//                    // Handle the error condition.c
-//                });
-            },
-            templateUrl: '/templates/nav-contact.html',
-            transclude: true,
-            link: function (scope, element) {
-                var contactId =scope.contact;
-
-                scope.$watch('contact', function(newVal) {
                     if (angular.isUndefined(newVal) || newVal == null) {
                         return
                     }
-                    ionicLoading.unload();
-                    // do somethings with newVal
-                    scope.isPeer = isPeer(scope.contact);
-                    console.log(scope.contact,scope.isPeer);
+//                    console.log('y2');
+                    myPeerService.findContact(buildParms1(),angular.toJson(newVal));// number to string
+
+                });
+                function buildParms1() {
+                    return {
+                        pass: function (p) {
+                            console.log(p);
+                            $scope.isContact = p;
+                        }
+                    };
+                }
+            },
+            template: '<a class="button button-small button-positive"' +
+                'ng-hide="isContact" ng-click="addPeer()">{{ btnText }}</a>',
+            replace: true,
+            link: function ($scope, element) {
+
+
+
+                $scope.$watch('isContact', function (newVal) {
+
+                    if (angular.isUndefined(newVal) || newVal == null) {
+                        return
+                    }
+                    console.log(newVal);
+                    if (newVal == false) {
+                        $scope.btnText = 'toAdd';
+//                        $animate.addClass(element,'button button-small button-positive');
+                        console.log(element);
+                    }
+
                 });
 
 
-                scope.name = scope.contact;
-//                $scope.name1 = '2';
-//                $scope.contact=contact1;
-                console.log(scope.contact);
+                $scope.addPeer = function () {
+                    myPeerService.addContact(buildParms(), angular.toJson($scope.contactId));
+                };
+
+                //change the button information after the contact is added
+                $scope.$watch('pass', function (newVal) {
+                    if (newVal == true) {
+                        $scope.btnText = 'added';
+                        $animate.setClass(element, 'button-balanced','button-positive');
+                    }
+                });
+
+                function buildParms() {
+                    return {
+                        pass: function (p) {
+                            $scope.pass = p;
+                        },
+                        callback: function (err) {
+                            if (err) {
+                                $scope.err = err;
+                            }
+                            else {
+                                $scope.msg = 'peer added!';
+                            }
+                        }
+                    };
+                }
 
             }
         };
@@ -102,96 +146,67 @@ angular.module('myApp.controllers.messages', [])
             return arrayToReturn;
         };
     })
-    .controller('messagesCtrl', function ($scope, syncData, $rootScope, ionicLoading) {
-
-        $scope.components = syncData(['users', $rootScope.auth_min.user, 'components']);
+    .controller('componentListCtrl', function ($scope, ionicLoading, myComponentService) {
+        $scope.components = myComponentService.all.$asArray();
         ionicLoading.load();
-        $scope.components.$on("loaded", function () {
-            console.log("Initial data received!");
+        $scope.components.$loaded().then(function () {
+//            console.log("Initial data received!");
             ionicLoading.unload();
         });
 
     })
-    .controller('messageDetailCtrl', function ($location, $timeout, $scope, $stateParams, $rootScope, syncData, ionicLoading, $filter) {
+    .controller('messageHeaderCtrl', function ($location, $timeout, $scope, syncData, ionicLoading) {
         var url = $location.url(),
             params = $location.search();
         var messageId = params.key;
-        $scope.message = [];
-        $scope.message = syncData(['messages', messageId]);
         ionicLoading.load();
-        $scope.message.$on("loaded", function () {
-            console.log("Initial data received!");
-            ionicLoading.unload();
+
+        $scope.message = syncData(['messages', messageId]).$asObject();
+        $scope.message.$loaded().then(
+            function () {
+//                console.log($scope.message);
+                ionicLoading.unload();
+            }
+        );
+    })
+    .controller('PopoverCtrl', function ($scope, $ionicPopover) {
+        $ionicPopover.fromTemplateUrl('templates/my-popover.html', {
+            scope: $scope
+        }).then(function (popover) {
+            $scope.popover = popover;
+        });
+        $scope.openPopover = function ($event) {
+            $scope.popover.show($event);
+        };
+        $scope.closePopover = function () {
+            $scope.popover.hide();
+        };
+        //Cleanup the popover when we're done with it!
+        $scope.$on('$destroy', function () {
+            $scope.popover.remove();
         });
     })
+    .controller('messagesDetailCtrl', function (myComponentService, myMessageService, $stateParams, $location, $timeout, $scope, $rootScope, syncData, ionicLoading, $filter) {
 
-    .controller('messagesDetailCtrl', function ($location, $timeout, $scope, $stateParams, $rootScope, syncData, ionicLoading, $filter) {
-        $scope.component = $stateParams.component;
-        ionicLoading.load();
+        var currentComponentId = $scope.componentId = $stateParams.component;
         var orderBy = $filter('orderBy');
-        var componentsRef = syncData(['users', $rootScope.auth_min.user, 'components', $scope.component, 'unreadCount']);
-        var messageRef = syncData(['users', $rootScope.auth_min.user, 'messages', $scope.component ]);
-
-        function objectToArray() {
-            var keys = messageRef.$getIndex();
-            $scope.messages = [];
-            keys.forEach(function (key, i) {
-                $scope.messages.push(messageRef [key]);
-            });
-        }
-
-        messageRef.$on("loaded", function () {
-            objectToArray();
+        $scope.messages = myMessageService.findMessageByComponent(currentComponentId).$asObject();
+        ionicLoading.load();
+        $scope.messages.$loaded().then(function () {
             ionicLoading.unload();
-            console.log("Initial data received!");
-
+//            console.log($scope.messages);
         });
-        messageRef.$on("change", function () {
-            objectToArray();
-            $scope.messages = orderBy($scope.messages, 'favorite', true);
-            console.log("A remote change was applied locally!");
-        });
-        $scope.favorite = function (key) {
-            ionicLoading.load();
-            messageRef[key].favorite = !messageRef[key].favorite;
-            messageRef.$save(key).then(function(){
-                ionicLoading.unload();
-            });
-        };
-        function unreadToRead(key){
-            messageRef[key].read = false;
-        }
         $scope.goDetail = function (key) {
-            unreadToRead(key);
-            messageRef.$save(key).then(function () {
-                recalculateUnreadCount();
+            $scope.messages[key].read = false;
+            $scope.messages.$save(key).then(function () {
+                myComponentService.UnreadCountMinus(currentComponentId);
                 $location.path('/message').search({
                     'key': key
                 });
             });
 
         };
-        function recalculateUnreadCount() {
-            componentsRef.$transaction(function (currentCount) {
-                if (!currentCount) return 1;   // Initial value for counter.
-                if (currentCount < 0) return;  // Return undefined to abort transaction.
-                return currentCount - 1;             // Increment the count by 1.
-            }).then(function (snapshot) {
-                if (!snapshot) {
-                    // Handle aborted transaction.
-                } else {
-                    // Do something.
-                }
-            }, function (err) {
-                // Handle the error condition.c
-            });
-        }
-
         $scope.order = function (predicate, reverse) {
-            console.log(predicate, reverse);
             $scope.messages = orderBy($scope.messages, predicate, reverse);
         };
     });
-
-
-
