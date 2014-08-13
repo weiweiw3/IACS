@@ -1,8 +1,8 @@
 angular.module('firebase.service.login', ['firebase', 'firebase.utils'])
 
     .factory('loginService', ['$rootScope', '$firebaseSimpleLogin',
-        'firebaseRef', 'authScopeUtil', 'profileCreator', '$timeout',
-        function ($rootScope, $firebaseSimpleLogin, firebaseRef, authScopeUtil, profileCreator, $timeout) {
+        'firebaseRef',  'profileCreator', '$timeout',
+        function ($rootScope, $firebaseSimpleLogin, firebaseRef, profileCreator, $timeout) {
             var auth = null;
             return {
                 init: function () {
@@ -35,7 +35,7 @@ angular.module('firebase.service.login', ['firebase', 'firebase.utils'])
                 },
 
                 addToScope: function ($scope) {
-                    authScopeUtil($scope);
+
                     $scope.login = this.login;
                     $scope.logout = this.logout;
                 },

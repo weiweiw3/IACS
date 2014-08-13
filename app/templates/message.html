@@ -3,6 +3,7 @@
     <div class="bar bar-header">
         <a class="button icon ion-navicon" href="#/tab/messages"> </a>
         <h1 class="title">{{ ::message.title }}</h1>
+
         <button class="button">Edit</button>
     </div>
 
@@ -10,11 +11,17 @@
         <ion-list>
             <ion-item type="item-text-wrap">
                 <h3>{{ 'status:' + message.status}}
-                    + {{message.last | date:"MM/dd/yyyy @ h:mma" }}</h3>
+                    <span am-time-ago="message.last"></span></h3>
+
             </ion-item>
             <ion-item type="item-text-wrap">
                 {{ 'fromUser:' + message.fromUser}}
                 <add-contact contact-id="::message.fromUser" >
+                </add-contact >
+            </ion-item>
+            <ion-item type="item-text-wrap">
+                {{ 'toUser:' + message.toUser}}
+                <add-contact contact-id="::message.toUser" >
                 </add-contact >
             </ion-item>
             <ion-item type="item-text-wrap">

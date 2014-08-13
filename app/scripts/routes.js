@@ -16,7 +16,7 @@ angular.module('myApp.routes', [ ])
 
             .state('tab', {            // setup an abstract state for the tabs directive
                 url: "/tab",
-//                authRequired: true,
+                authRequired: true,
                 abstract: true,
                 templateUrl: "templates/tabs.html"
             })
@@ -77,6 +77,7 @@ angular.module('myApp.routes', [ ])
             // the setting tab has its own child nav-view and history
             .state('tab.setting', {
                 url: '/setting',
+                authRequired: true,
                 views: {
                     'setting-tab': {
                         templateUrl: 'templates/setting.html',

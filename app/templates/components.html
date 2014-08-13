@@ -20,12 +20,7 @@
                 </div>
             </div>
         </div>
-        <div ng-controller="ForeverCtrl">
-            <ion-checkbox ng-repeat="(feedId,feed) in feedChoices | filter:feedChoiceFilter | orderBy:feed.title"
-                          ng-model="feed.description" ng-click="addFeed(feedId)">
-                {{ feedId }}
-            </ion-checkbox>
-        </div>
+
 
 
     </ion-content>

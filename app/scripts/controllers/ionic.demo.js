@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-angular.module('myApp.controller.ionic', ['myApp.utils', 'fr.feedManager'])
+angular.module('myApp.controller.ionic', [])
     .controller('componentsCtrl', function ($scope, $ionicLoading) {
         $scope.loadingOptions = {
             duration: 1000,
