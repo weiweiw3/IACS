@@ -27,28 +27,92 @@ angular.module('myApp.controllers.messages', [])
             return arrayToReturn;
         };
     })
-    .controller('componentListCtrl', function ($scope, ionicLoading, myComponentService) {
-        $scope.components = myComponentService.array;
+    .controller('componentListCtrl', function ($scope, ionicLoading, myComponent) {
+        $scope.components = myComponent.array;
         ionicLoading.load();
         $scope.components.$loaded().then(function () {
-//            console.log("Initial data received!");
+            console.log('componentListCtrl',"Initial data received!");
             ionicLoading.unload();
         });
-
+        $scope.$on( 'myComponent.update', function( event ) {
+            $scope.components.$loaded().then(function () {
+            console.log('componentListCtrl',"update");
+                console.log(    $scope.components);
+            });
+        });
     })
+    .controller('purchaseOrderHeaderCtrl',
+        function ($location, $timeout, $scope, fbutil, ionicLoading) {
+
+
+            $scope.$parent.$watch('message.docId', function (newVal) {
+                if (angular.isUndefined(newVal) || newVal == null) {
+                    return
+                }
+                console.log(newVal);
+                $scope.syncedData = fbutil.syncObject(['metadata','purchaseOrderHeader',
+                    newVal]);
+                $scope.syncedData.$loaded()
+                    .then(function(data){
+                        angular.forEach(data, function(value , key) {
+                            console.log(value+"--"+key)
+                        });
+//                        //all the data in the scope are from here.
+//                        $scope.message = {
+//                            "id": data.$id,
+//                            "component": data.component,
+//                            "docId": data.docId,
+//                            "last": data.last,
+//                            "statusPre": data.statusPre,
+//                            "statusCur": data.statusCur,
+//                            "statusNext": data.statusNext,
+//                            "title": data.title,
+//                            "userFrom": data.userFrom,
+//                            "userTo": data.userTo,
+//                            "locked": data.locked,
+//                            "lockedBy": data.lockedBy,
+//                            "lockedDate": data.lockedDate
+//                        };
+////                    console.log($scope.message);
+////
+                    });
+//                    .then(ionicLoading.unload());
+            });
+        })
     .controller('messageHeaderCtrl', function ($location, $timeout, $scope, syncData, ionicLoading) {
         var url = $location.url(),
             params = $location.search();
         var messageId = params.key;
         ionicLoading.load();
+        $scope.message = {};
+        $scope.syncedData = syncData(['messages', messageId]).$asObject();
+        $scope.syncedData.$watch(function (data) {
 
-        $scope.message = syncData(['messages', messageId]).$asObject();
-        $scope.message.$loaded().then(
-            function () {
-//                console.log($scope.message);
-                ionicLoading.unload();
-            }
-        );
+            console.log(data,"messageHeaderCtrl data changed!");
+            $scope.syncedData.$loaded()
+                .then(function(data){
+                    //all the data in the scope are from here.
+                    $scope.message = {
+                        "id": data.$id,
+                        "component": data.component,
+                        "docId": data.docId,
+                        "last": data.last,
+                        "statusPre": data.statusPre,
+                        "statusCur": data.statusCur,
+                        "statusNext": data.statusNext,
+                        "title": data.title,
+                        "userFrom": data.userFrom,
+                        "userTo": data.userTo,
+                        "locked": data.locked,
+                        "lockedBy": data.lockedBy,
+                        "lockedDate": data.lockedDate
+                    };
+//                    console.log($scope.message);
+
+                })
+                .then(ionicLoading.unload());
+        });
+
     })
     .controller('PopoverCtrl', function ($scope, $ionicPopover) {
         $ionicPopover.fromTemplateUrl('templates/my-popover.html', {
@@ -67,12 +131,14 @@ angular.module('myApp.controllers.messages', [])
             $scope.popover.remove();
         });
     })
-    .controller('messagesDetailCtrl', function (myComponentService, myMessageService, $stateParams, $location, $timeout, $scope, $rootScope, syncData, ionicLoading, $filter) {
+    .controller('myMessageListlCtrl', function (myComponent, myMessage,
+              $stateParams, $location, $timeout,$scope, ionicLoading) {
 
-        var currentComponentId = $scope.componentId = $stateParams.component;
-        var orderBy = $filter('orderBy');
-        $scope.messages = myMessageService.findMessageByComponent(currentComponentId);
+        $scope.component = $stateParams.component;
+
+        $scope.messages = myMessage.getMessageList($scope.component);
         ionicLoading.load();
+
         $scope.messages.$loaded().then(function () {
             ionicLoading.unload();
 //            console.log($scope.messages);
@@ -80,9 +146,9 @@ angular.module('myApp.controllers.messages', [])
         $scope.goDetail = function (key) {
             $scope.messages[key].read = false;
             $scope.messages.$save(key).then(function () {
-                myComponentService.UnreadCountMinus(currentComponentId);
+                myComponent.UnreadCountMinus($scope.component);
                 $location.path('/message').search({
-                    'key': key
+                    'key': $scope.messages[key].$id
                 });
             });
 

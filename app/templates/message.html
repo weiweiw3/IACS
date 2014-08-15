@@ -1,36 +1,76 @@
-
 <div ng-controller="messageHeaderCtrl">
     <div class="bar bar-header">
-        <a class="button icon ion-navicon" href="#/tab/messages"> </a>
-        <h1 class="title">{{ ::message.title }}</h1>
+        <a class="button icon ion-navicon" href="#/message/{{message.component}}"> </a>
 
-        <button class="button">Edit</button>
+        <h1 class="title">{{ message.docId }}</h1>
+
+        <button favorite-message
+                component="message.component"
+                message-id="message.id"
+                class="button icon-left ion-star button-positive">Favorites
+        </button>
     </div>
 
     <ion-content>
         <ion-list>
             <ion-item type="item-text-wrap">
-                <h3>{{ 'status:' + message.status}}
-                    <span am-time-ago="message.last"></span></h3>
-
+                {{ 'userFrom:' + message.userFrom}}
+                <add-contact contact-id="message.userFrom">
+                </add-contact>
             </ion-item>
             <ion-item type="item-text-wrap">
-                {{ 'fromUser:' + message.fromUser}}
-                <add-contact contact-id="::message.fromUser" >
-                </add-contact >
+                {{ 'userTo:' + message.userTo}}
+                <add-contact contact-id="message.userTo">
+                </add-contact>
             </ion-item>
             <ion-item type="item-text-wrap">
-                {{ 'toUser:' + message.toUser}}
-                <add-contact contact-id="::message.toUser" >
-                </add-contact >
-            </ion-item>
-            <ion-item type="item-text-wrap">
-                {{ 'toUser:' + message.toUser}}
-                <add-contact contact-id="::message.toUser" >
-                </add-contact >
+                <reset message="message">
+                </reset>
+                <next message="message">
+                </next>
             </ion-item>
         </ion-list>
+        <div class="list" ng-controller="purchaseOrderHeaderCtrl">
+
+            <div class="item item-divider">
+                Header{{ message.docId }}
+            </div>
+
+            <a class="item" href="#">
+                Butterfinger
+            </a>
+
+            <a class="item" href="#">
+                Butterfinger
+            </a>
+
+            <div class="item item-divider">
+                Items
+            </div>
+            <a class="item" href="#">
+                Butterfinger
+            </a>
+            <div class="item item-divider">
+                Header
+            </div>
+
+            <a class="item" href="#">
+                Butterfinger
+            </a>
+
+            <a class="item" href="#">
+                Butterfinger
+            </a>
+
+            <div class="item item-divider">
+                Items
+            </div>
+            <a class="item" href="#">
+                Butterfinger
+            </a>
+        </div>
     </ion-content>
+
 </div>
 
 
