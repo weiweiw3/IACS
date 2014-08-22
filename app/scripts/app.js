@@ -8,6 +8,7 @@ var dependencyModules = [
     'firebase.simpleLogin',
     'firebase',
     'ionic',
+    'elasticsearch',
     'angular-momentjs'];
 var myAppComponents = [
     'myApp.routes',

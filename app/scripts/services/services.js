@@ -3,7 +3,13 @@
 (function (angular) {
     "use strict";
     var appServices = angular.module('myApp.services', ['firebase', 'firebase.utils']);
-
+    appServices.service('client', function (esFactory) {
+        return esFactory({
+            host: 'localhost:9200',
+            apiVersion: '1.3',
+            log: 'trace'
+        });
+    });
 
     appServices.factory('myContact',
         function ($timeout, $q, $firebase, $rootScope, fbutil) {

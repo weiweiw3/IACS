@@ -36,37 +36,25 @@
                 Header{{ message.docId }}
             </div>
 
-            <a class="item" href="#">
-                Butterfinger
+            <a ng-repeat="data in syncedData" class="item">
+                {{ data.$id+': '+data.$value }}
             </a>
-
-            <a class="item" href="#">
-                Butterfinger
-            </a>
+        </div>
+        <div class="list" ng-controller="purchaseOrderItemCtrl">
 
             <div class="item item-divider">
-                Items
-            </div>
-            <a class="item" href="#">
-                Butterfinger
-            </a>
-            <div class="item item-divider">
-                Header
+                Item
             </div>
 
-            <a class="item" href="#">
-                Butterfinger
+            <a ng-repeat="data in syncedData" class="item">
+                {{ data }}
             </a>
 
-            <a class="item" href="#">
-                Butterfinger
-            </a>
-
-            <div class="item item-divider">
-                Items
-            </div>
-            <a class="item" href="#">
-                Butterfinger
+            <button ng-hide="isloaded" class="button button-full button-stable" ng-click="loadingMore()">
+                {{ loadText }}
+            </button>
+            <a ng-repeat="data in continued" class="item">
+                {{ data }}
             </a>
         </div>
     </ion-content>
