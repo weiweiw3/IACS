@@ -1,9 +1,16 @@
-<ion-view title="Contact Detail" >
-    <ion-content class="padding" ng-controller="contactDetailCtrl">
-        <label >
-            <span class="input-label">{{ contactDetail.first_name }} {{ contactDetail.last_name }}</span>
+<div ng-controller="contactDetailCtrl">
+    <div class="bar bar-header">
+        <a class="button icon-left ion-chevron-left button-clear button-dark" href="#/tab/contacts">
+            Back
+        </a>
 
-        </label>
+        <h1 class="title">{{ contactDetail.first_name }} {{ contactDetail.last_name }}</h1>
+
+
+    </div>
+
+    <ion-content class="padding">
+
         <label class="item item-input">
             <span class="input-label">Alias</span>
             <input type="text" ng-model="contactDetail.alias">
@@ -37,5 +44,4 @@
     </ion-content>
 
 
-
-</ion-view>
+</div>

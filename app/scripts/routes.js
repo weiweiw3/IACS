@@ -41,6 +41,11 @@ angular.module('myApp.routes', [ ])
                 templateUrl: 'templates/message.html'
 
             })
+            .state('components-management', {
+                url: '/components-management',
+                templateUrl: 'templates/components-management.html'
+
+            })
             // the contacts tab has its own child nav-view and history
             .state('tab.contacts', {
                 url: '/contacts',
@@ -52,14 +57,9 @@ angular.module('myApp.routes', [ ])
                 }
             })
 
-            .state('tab.contacts-detail', {
+            .state('contacts-detail', {
                 url: '/contacts/:contactId',
-                views: {
-                    'contacts-tab': {
-                        templateUrl: 'templates/contact-detail.html'
-                    }
-                }
-
+                templateUrl: 'templates/contact-detail.html'
             })
 
             // the components tab has its own child nav-view and history

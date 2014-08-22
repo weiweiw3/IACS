@@ -4,35 +4,27 @@
  -->
 <ion-view title="Setting">
 
-  <ion-content>
+    <ion-content>
 
-    <ion-list>
-        <ion-item type="item-text-wrap" ng-controller="setting.profileCtrl">
-            {{ auth.user.id }}{{ profile.b }}
-
-        <a class="button icon ion-home" href="#/tab/myprofile"> </a>
-        </ion-item>
-        <ion-item type="item-text-wrap" >
-            <div ng-show-auth="login">{{auth.user}} {{auth.user.id}} is logged in</div>
-            <div ng-show-auth="logout">Logged out</div>
-            <div ng-show-auth="error">An error occurred: {{auth.error}}</div>
-
-        </ion-item>
+        <ion-list>
+            <ion-item type="item-text-wrap" ng-controller="setting.profileCtrl">
+                {{ auth.user.id }}{{ profile.b }}
+                <a class="button icon ion-home" href="#/tab/myprofile"> </a>
+            </ion-item>
+            <ion-item type="item-text-wrap" href="#/components-management"> >
+                components-management
+            </ion-item>
 
 
-        <ion-item type="item-text-wrap" >
-            <form ng-submit="show1()">
-                <button on-swipe-left="onSwipeLeft()" class="button button-block button-positive" type="submit">show</button>
-            </form>
-        </ion-item>
-        <ion-item type="item-text-wrap" >
-            <form ng-submit="logout()">
-                <button class="button button-assertive button-block"  type="submit">logout</button>
-            </form>
-        </ion-item>
+            <ion-item type="item-text-wrap" ng-controller="LogoutCtrl">
+                <button class="button button-assertive button-block" ng-click="tryLogout()">
+                    logout
+                </button>
 
-    </ion-list>
+            </ion-item>
 
-  </ion-content>
+        </ion-list>
+
+    </ion-content>
 
 </ion-view>

@@ -15,7 +15,7 @@ angular.module('myApp.controller.ionic', [])
         };
     })
 
-    .controller('ActionSheetCtrl', function ($scope, $ionicActionSheet) {
+    .controller('ActionSheetCtrl1', function ($scope, $ionicActionSheet) {
         $scope.messages = [];
         $scope.takeAction = function () {
             $ionicActionSheet.show({
