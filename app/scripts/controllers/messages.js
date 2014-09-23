@@ -126,10 +126,12 @@ angular.module('myApp.controllers.messages', [])
             $scope.syncedData.$loaded()
                 .then(function (data) {
                     $scope.message = data;//all the data in the scope are from here.
+                    $scope.message.id=data.$id;
                     angular.forEach($scope.message, function (value, key) {
                         if (!key.indexOf('$')) {
                             delete $scope.message[key];
                         }
+
                     });
 //                    console.log($scope.message);
                 })
@@ -140,7 +142,7 @@ angular.module('myApp.controllers.messages', [])
             $log.info(ctrlName, 'has loaded');
         });
         $scope.$on('$destroy', function () {
-            $scope.syncedData.$destroy();
+//            $scope.syncedData.$destroy();
             ionicLoading.unload();
             console.log(ctrlName, 'is no longer necessary');
         });
