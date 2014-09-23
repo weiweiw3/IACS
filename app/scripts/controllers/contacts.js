@@ -3,7 +3,7 @@ angular.module('myApp.controllers.contacts', [ ])
     .controller('contactDetailCtrl',function($scope,syncData,$stateParams,$rootScope){
     /*triple data binding*/
     $scope.syncContactDetail = function() {
-        syncData(['users',$rootScope.auth_min.user, 'peers',$stateParams.contactId])
+        syncData(['users',$rootScope.auth.user, 'contacts',$stateParams.contactId])
             .$asObject()
             .$bindTo($scope, 'contactDetail')
             .then(function(unBind) {
@@ -21,7 +21,7 @@ angular.module('myApp.controllers.contacts', [ ])
 
 
 })
-    .controller('ContactsCtrl', function (syncData, $scope, articleFactory,
+    .controller('ContactsCtrl', function (syncData, $scope,
                                           $rootScope, $ionicScrollDelegate, ionicLoading) {
         var contacts = $scope.contacts = [];
         var contactsFavorite = [];
@@ -29,7 +29,7 @@ angular.module('myApp.controllers.contacts', [ ])
         var currentCharCode = 'A'.charCodeAt(0) - 1;
         function syncContacts() {
         }
-        var CONTACT = syncData(['users', $rootScope.auth_min.user,'peers']).$asArray();
+        var CONTACT = syncData(['users', $rootScope.auth.user,'contacts']).$asArray();
 
         function orderName(){
             contactsFavorite = [];

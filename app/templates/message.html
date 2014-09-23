@@ -1,29 +1,64 @@
-
 <div ng-controller="messageHeaderCtrl">
     <div class="bar bar-header">
-        <a class="button icon ion-navicon" href="#/tab/messages"> </a>
-        <h1 class="title">{{ ::message.title }}</h1>
-        <button class="button">Edit</button>
+        <a class="button icon ion-navicon" href="#/message/{{message.component}}"> </a>
+
+        <h1 class="title">{{ message.docId }}</h1>
+
+        <button favorite-message
+                component="message.component"
+                message-id="message.id"
+                class="button icon-left ion-star button-positive">Favorites
+        </button>
     </div>
 
     <ion-content>
         <ion-list>
             <ion-item type="item-text-wrap">
-                <h3>{{ 'status:' + message.status}}
-                    + {{message.last | date:"MM/dd/yyyy @ h:mma" }}</h3>
+                {{ 'userFrom:' + message.userFrom}}
+                <add-contact contact-id="message.userFrom">
+                </add-contact>
             </ion-item>
             <ion-item type="item-text-wrap">
-                {{ 'fromUser:' + message.fromUser}}
-                <add-contact contact-id="::message.fromUser" >
-                </add-contact >
+                {{ 'userTo:' + message.userTo}}
+                <add-contact contact-id="message.userTo">
+                </add-contact>
             </ion-item>
             <ion-item type="item-text-wrap">
-                {{ 'toUser:' + message.toUser}}
-                <add-contact contact-id="::message.toUser" >
-                </add-contact >
+                <reset message="message">
+                </reset>
+                <next message="message">
+                </next>
             </ion-item>
         </ion-list>
+        <div class="list" ng-controller="purchaseOrderHeaderCtrl">
+
+            <div class="item item-divider">
+                Header{{ message.docId }}
+            </div>
+
+            <a ng-repeat="data in syncedData" class="item">
+                {{ data.$id+': '+data.$value }}
+            </a>
+        </div>
+        <div class="list" ng-controller="purchaseOrderItemCtrl">
+
+            <div class="item item-divider">
+                Item
+            </div>
+
+            <a ng-repeat="data in syncedData" class="item">
+                {{ data }}
+            </a>
+
+            <button ng-hide="isloaded" class="button button-full button-stable" ng-click="loadingMore()">
+                {{ loadText }}
+            </button>
+            <a ng-repeat="data in continued" class="item">
+                {{ data }}
+            </a>
+        </div>
     </ion-content>
+
 </div>
 
 

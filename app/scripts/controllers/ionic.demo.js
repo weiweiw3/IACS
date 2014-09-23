@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-angular.module('myApp.controller.ionic', ['myApp.utils', 'fr.feedManager'])
+angular.module('myApp.controller.ionic', [])
     .controller('componentsCtrl', function ($scope, $ionicLoading) {
         $scope.loadingOptions = {
             duration: 1000,
@@ -15,7 +15,7 @@ angular.module('myApp.controller.ionic', ['myApp.utils', 'fr.feedManager'])
         };
     })
 
-    .controller('ActionSheetCtrl', function ($scope, $ionicActionSheet) {
+    .controller('ActionSheetCtrl1', function ($scope, $ionicActionSheet) {
         $scope.messages = [];
         $scope.takeAction = function () {
             $ionicActionSheet.show({

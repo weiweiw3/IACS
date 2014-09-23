@@ -16,7 +16,7 @@ angular.module('myApp.routes', [ ])
 
             .state('tab', {            // setup an abstract state for the tabs directive
                 url: "/tab",
-//                authRequired: true,
+                authRequired: true,
                 abstract: true,
                 templateUrl: "templates/tabs.html"
             })
@@ -41,6 +41,11 @@ angular.module('myApp.routes', [ ])
                 templateUrl: 'templates/message.html'
 
             })
+            .state('components-management', {
+                url: '/components-management',
+                templateUrl: 'templates/components-management.html'
+
+            })
             // the contacts tab has its own child nav-view and history
             .state('tab.contacts', {
                 url: '/contacts',
@@ -52,14 +57,9 @@ angular.module('myApp.routes', [ ])
                 }
             })
 
-            .state('tab.contacts-detail', {
+            .state('contacts-detail', {
                 url: '/contacts/:contactId',
-                views: {
-                    'contacts-tab': {
-                        templateUrl: 'templates/contact-detail.html'
-                    }
-                }
-
+                templateUrl: 'templates/contact-detail.html'
             })
 
             // the components tab has its own child nav-view and history
@@ -77,6 +77,7 @@ angular.module('myApp.routes', [ ])
             // the setting tab has its own child nav-view and history
             .state('tab.setting', {
                 url: '/setting',
+                authRequired: true,
                 views: {
                     'setting-tab': {
                         templateUrl: 'templates/setting.html',
