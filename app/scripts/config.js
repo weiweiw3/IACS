@@ -2,7 +2,7 @@ angular.module('myApp.config', [])
     .constant('version', '0.1')
 
     // end this with a trailing slash
-    .constant('FIREBASE_URL', 'https://ang-ww.firebaseio.com/')
+    .constant('FIREBASE_URL', 'https://40288b8147cd16ce0147cd236df20000.firebaseio.com/')
 
     //
     .constant('loginRedirectPath', '/login')

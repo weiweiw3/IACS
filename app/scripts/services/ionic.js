@@ -2,7 +2,7 @@
 angular.module('myApp.services.ionic', ['ionic'])
 .service('ionicLoading',function($ionicLoading){
         this.load=function(loadText){
-            var loadText = loadText || 'Loading...';
+             loadText = loadText || 'Loading...';
 
             $ionicLoading.show({
                 template: '<i class="icon ion-loading-c"></i>\n<br/>\n'+loadText ,

@@ -4,11 +4,12 @@ var dependencyModules = [
     'firebase.utils',
     'firebase.utils.old',
     'firebase.service.login',
-    'firebase.simpleLoginTools',
+//  'firebase.simpleLoginTools',
     'firebase.simpleLogin',
     'firebase',
     'ionic',
-    'elasticsearch',
+//    'ui.router',
+//  'elasticsearch',
     'angular-momentjs'];
 var myAppComponents = [
     'myApp.routes',
@@ -16,7 +17,6 @@ var myAppComponents = [
     'myApp.config',
     'myApp.filters',
 //  'appServices',
-
     'myApp.directives',
     'myApp.controllers.setting',
     'myApp.controllers.contacts',
@@ -30,8 +30,14 @@ var myAppComponents = [
 // Declare app level module which depends on filters, and services
 var myApp = angular.module('starter', dependencyModules.concat(myAppComponents));
 
+// do all the things ionic needs to get going
 myApp.run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
+        // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+        // for form inputs)
+        if (window.cordova && window.cordova.plugins.Keyboard) {
+            cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        }
         if (window.StatusBar) {
             StatusBar.styleDefault();
         }
@@ -42,7 +48,7 @@ myApp.run(function ($ionicPlatform) {
 
 myApp.run(function ($state, simpleLogin, $rootScope) {
 
-    simpleLogin.addToScope($rootScope);
+//    simpleLogin.addToScope($rootScope);
 
 });
 
@@ -56,16 +62,17 @@ myApp.run(['$rootScope', '$location', '$log', function ($rootScope, $location, $
 
     // this can't be done inside the .config() call because there is no access to $rootScope
     // so we hack it in here to supply it to the .config routing methods
-    $rootScope.$watch('auth.authenticated', function () {
-        isAuthenticated = $rootScope.auth.authenticated;
-    });
-
-    $rootScope.$watch('auth.user', function (value) {
-        if (value == null) {
-            console.log('user is null');
-            $location.path('/login');
-        }
-    });
+//    $rootScope.$watch('auth.authenticated', function () {
+//        isAuthenticated = $rootScope.auth.authenticated;
+//    });
+//
+//    $rootScope.$watch('auth.user', function (value) {
+//
+//        if (value == null) {
+//            console.log('user is null');
+//            $location.path('/login');
+//        }
+//    });
 }]);
 
 

@@ -5,11 +5,7 @@
 
 (function(exports) {
 
-/**
- * @var {Object} a namespace to store internal utils for use by Firebase.Util methods
- */
 var fb = {};
-
 (function(exports, fb) {
    var undefined;
 

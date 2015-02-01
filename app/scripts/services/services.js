@@ -209,7 +209,7 @@
             return messageUpdate;
         }]);
     appServices.factory('myMessage', ['$rootScope', 'fbutil',
-        function ($rootScope, fbutil) {
+        function($rootScope, fbutil) {
             var currentUser = $rootScope.auth.user;
             var syncedObject = fbutil.syncObject(['users', currentUser , 'messages']);
             var syncedArray = fbutil.syncArray(['users', currentUser , 'messages']);
