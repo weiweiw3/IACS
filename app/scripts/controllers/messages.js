@@ -1,32 +1,32 @@
 angular.module('myApp.controllers.messages', [])
     .controller('componentManagementCtrl', function
-        ($scope, $log, ionicLoading, myComponent,$ionicPopover) {
+        ($scope, $log, ionicLoading, myComponent, $ionicPopover) {
         $ionicPopover.fromTemplateUrl('my-popover1.html', {
             scope: $scope
-        }).then(function(popover) {
+        }).then(function (popover) {
             $scope.popover = popover;
         });
-        $scope.openPopover = function($event) {
+        $scope.openPopover = function ($event) {
             $scope.popover.show($event);
         };
-        $scope.closePopover = function() {
+        $scope.closePopover = function () {
             $scope.popover.hide();
         };
         //Cleanup the popover when we're done with it!
-        $scope.$on('$destroy', function() {
+        $scope.$on('$destroy', function () {
             $scope.popover.remove();
         });
         // Execute action on hide popover
-        $scope.$on('popover.hidden', function() {
+        $scope.$on('popover.hidden', function () {
             // Execute action
         });
         // Execute action on remove popover
-        $scope.$on('popover.removed', function() {
+        $scope.$on('popover.removed', function () {
             // Execute action
         });
     })
 
-        //for message-index.html
+    //for message-index.html
     .controller('componentListCtrl', function ($scope, $log, ionicLoading, myComponent) {
         var ctrlName = 'componentListCtrl';
         $scope.components = myComponent.array;
@@ -58,19 +58,19 @@ angular.module('myApp.controllers.messages', [])
             showDelete: false
         };
 
-        $scope.edit = function(item) {
+        $scope.edit = function (item) {
             alert('Edit Item: ' + item.id);
         };
-        $scope.share = function(item) {
+        $scope.share = function (item) {
             alert('Share Item: ' + item.id);
         };
 
-        $scope.moveItem = function(item, fromIndex, toIndex) {
+        $scope.moveItem = function (item, fromIndex, toIndex) {
             $scope.components.splice(fromIndex, 1);
             $scope.components.splice(toIndex, 0, item);
         };
 
-        $scope.onItemDelete = function(item) {
+        $scope.onItemDelete = function (item) {
             $scope.components.splice($scope.components.indexOf(item), 1);
         };
 //        $scope.$on("$routeChangeStart",
@@ -126,7 +126,7 @@ angular.module('myApp.controllers.messages', [])
             $scope.syncedData.$loaded()
                 .then(function (data) {
                     $scope.message = data;//all the data in the scope are from here.
-                    $scope.message.id=data.$id;
+                    $scope.message.id = data.$id;
                     angular.forEach($scope.message, function (value, key) {
                         if (!key.indexOf('$')) {
                             delete $scope.message[key];

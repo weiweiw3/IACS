@@ -1,6 +1,6 @@
 angular.module('myApp.controllers.chatRoom', [])
 
-    .controller('RoomListCtrl', function($scope, $timeout, $firebase, $location) {
+    .controller('RoomListCtrl', function ($scope, $timeout, $firebase, $location) {
         var ref = new Firebase('https://miller1.firebaseio.com/opened_rooms');
         $scope.rooms = $firebase(ref);
 
@@ -8,18 +8,18 @@ angular.module('myApp.controllers.chatRoom', [])
             {
                 type: 'button-energized',
                 content: '<i class="icon ion-plus"></i>',
-                tap: function(e) {
+                tap: function (e) {
                     $location.path("/new");
                 }
             }
         ];
     })
 
-    .controller('RoomCreateCtrl', function($scope, $timeout, $firebase, $location) {
+    .controller('RoomCreateCtrl', function ($scope, $timeout, $firebase, $location) {
         var ref = new Firebase('https://miller1.firebaseio.com/opened_rooms');
         $scope.rooms = $firebase(ref);
 
-        $scope.createRoom = function(roomName, roomDescription) {
+        $scope.createRoom = function (roomName, roomDescription) {
             if (!roomName) return;
 
             var roomId = Math.floor(Math.random() * 5000001);
@@ -38,7 +38,7 @@ angular.module('myApp.controllers.chatRoom', [])
             {
                 type: 'button-energized',
                 content: '<i class="icon ion-plus"></i>',
-                tap: function(e) {
+                tap: function (e) {
                     $location.path("/new");
                 }
             }
@@ -46,7 +46,7 @@ angular.module('myApp.controllers.chatRoom', [])
     })
 
 
-    .controller('RoomCtrl', function($scope, $stateParams, $timeout, $firebase, $location, $ionicScrollDelegate) {
+    .controller('RoomCtrl', function ($scope, $stateParams, $timeout, $firebase, $location, $ionicScrollDelegate) {
         var roomRef = new Firebase('https://miller1.firebaseio.com/opened_rooms/');
         var messagesRef = new Firebase('https://miller1.firebaseio.com/rooms/' + $stateParams.roomId);
 
@@ -59,23 +59,25 @@ angular.module('myApp.controllers.chatRoom', [])
             {
                 type: 'button-energized',
                 content: '<i class="icon ion-arrow-left-c"></i>',
-                tap: function(e) {
+                tap: function (e) {
                     $location.path('/');
                 }
             }
         ]
 
-        var scrollBottom = function() {
+        var scrollBottom = function () {
             // Resize and then scroll to the bottom
             $ionicScrollDelegate.resize();
-            $timeout(function() {
+            $timeout(function () {
                 $ionicScrollDelegate.scrollBottom();
             });
         };
 
         $scope.$watch('messagesObj', function (value) {
             var messagesObj = angular.fromJson(angular.toJson(value));
-            $timeout(function () {scrollBottom()});
+            $timeout(function () {
+                scrollBottom()
+            });
             $scope.messages = [];
 
             angular.forEach(messagesObj, function (message, key) {
@@ -95,11 +97,12 @@ angular.module('myApp.controllers.chatRoom', [])
                 if ($scope.room) return;
                 if (room.id == $stateParams.roomId) {
                     $scope.room = room;
-                };
+                }
+                ;
             });
         }, true);
 
-        $scope.submitAddMessage = function() {
+        $scope.submitAddMessage = function () {
             $scope.messagesObj.$add({
                 created_by: this.username,
                 content: this.newMessage,
@@ -111,5 +114,7 @@ angular.module('myApp.controllers.chatRoom', [])
         };
     })
 
-    .controller('AboutCtrl', function($scope) {})
-    .controller('AppCtrl', function($scope, $state) {});
+    .controller('AboutCtrl', function ($scope) {
+    })
+    .controller('AppCtrl', function ($scope, $state) {
+    });

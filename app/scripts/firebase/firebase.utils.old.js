@@ -45,7 +45,7 @@ angular.module('firebase.utils.old', ['firebase'])
          */
         return function (path, limit) {
             var ref = firebaseRef(path);
-            limit && (ref = ref.endAt('q','002').limit(limit));
+            limit && (ref = ref.endAt('q', '002').limit(limit));
             return $firebase(ref);
         }
     }])

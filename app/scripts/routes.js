@@ -4,7 +4,7 @@
 
 "use strict";
 
-angular.module('myApp.routes', [ ])
+angular.module('myApp.routes', ['firebase.simpleLogin' ])
 
     .config(['$stateProvider', '$urlRouterProvider',
         function ($stateProvider, $urlRouterProvider) {
@@ -29,6 +29,15 @@ angular.module('myApp.routes', [ ])
                         'messages-tab': {
                             templateUrl: 'templates/message-index.html'
                         }
+                    },
+                    resolve: {
+                        // forces the page to wait for this promise to resolve before controller is loaded
+                        // the controller can then inject `user` as a dependency. This could also be done
+                        // in the controller, but this makes things cleaner (controller doesn't need to worry
+                        // about auth status or timing of displaying its UI components)
+                        user: ['simpleLogin', function (simpleLogin) {
+                            return simpleLogin.getUser();
+                        }]
                     }
                 })
 
@@ -101,6 +110,7 @@ angular.module('myApp.routes', [ ])
             //isAuthenticated is set below in the .run() command
             $urlRouterProvider.otherwise(
                 function () {
+                    console.log('x');
                     if (isAuthenticated) {
                         return '/tab/messages'
                     } else {

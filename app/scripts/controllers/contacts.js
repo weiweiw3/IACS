@@ -1,37 +1,38 @@
 angular.module('myApp.controllers.contacts', [ ])
 
-    .controller('contactDetailCtrl',function($scope,syncData,$stateParams,$rootScope){
-    /*triple data binding*/
-    $scope.syncContactDetail = function() {
-        syncData(['users',$rootScope.auth.user, 'contacts',$stateParams.contactId])
-            .$asObject()
-            .$bindTo($scope, 'contactDetail')
-            .then(function(unBind) {
-                $scope.unBindProfile = unBind;
-            });
-    };
-    // set initial binding
-    $scope.syncContactDetail();
+    .controller('contactDetailCtrl', function ($scope, syncData, $stateParams, $rootScope) {
+        /*triple data binding*/
+        $scope.syncContactDetail = function () {
+            syncData(['users', $rootScope.auth.user, 'contacts', $stateParams.contactId])
+                .$asObject()
+                .$bindTo($scope, 'contactDetail')
+                .then(function (unBind) {
+                    $scope.unBindProfile = unBind;
+                });
+        };
+        // set initial binding
+        $scope.syncContactDetail();
 
-    $scope.unBindData = function() {
-        // disable bind to prevent junk data being left in firebase
-        $scope.unBindProfile();
+        $scope.unBindData = function () {
+            // disable bind to prevent junk data being left in firebase
+            $scope.unBindProfile();
 
-    };
+        };
 
 
-})
-    .controller('ContactsCtrl', function (syncData, $scope,
-                                          $rootScope, $ionicScrollDelegate, ionicLoading) {
+    })
+    .controller('ContactsCtrl', function (syncData, $scope, $rootScope, $ionicScrollDelegate, ionicLoading) {
         var contacts = $scope.contacts = [];
         var contactsFavorite = [];
         var contactsUnfavorite = [];
         var currentCharCode = 'A'.charCodeAt(0) - 1;
+
         function syncContacts() {
         }
-        var CONTACT = syncData(['users', $rootScope.auth.user,'contacts']).$asArray();
 
-        function orderName(){
+        var CONTACT = syncData(['users', $rootScope.auth.user, 'contacts']).$asArray();
+
+        function orderName() {
             contactsFavorite = [];
             contactsUnfavorite = [];
             currentCharCode = 'A'.charCodeAt(0) - 1;
@@ -55,7 +56,7 @@ angular.module('myApp.controllers.contacts', [ ])
                         addLetter(currentCharCode + i);
                     }
                     currentCharCode = personCharCode;
-                    if (person.favorite==true){
+                    if (person.favorite == true) {
                         contactsFavorite.push(person);
                     } else {
                         contactsUnfavorite.push(person);
@@ -68,15 +69,16 @@ angular.module('myApp.controllers.contacts', [ ])
             }
             contacts = contactsFavorite.concat(contactsUnfavorite);
         }
+
         ionicLoading.load();
 
         CONTACT.$loaded().then(
-            function(){
+            function () {
                 orderName();
                 ionicLoading.unload();
             }
         );
-        CONTACT.$watch(function(event) {
+        CONTACT.$watch(function (event) {
             orderName();
 //            console.log(event);
         });
@@ -112,7 +114,7 @@ angular.module('myApp.controllers.contacts', [ ])
             return contacts.filter(function (item) {
                 var itemDoesMatch = !$scope.search || item.isLetter ||
                     item.first_name.toLowerCase().indexOf($scope.search.toLowerCase()) > -1 ||
-                    item.last_name.toLowerCase().indexOf($scope.search.toLowerCase()) > -1 ;
+                    item.last_name.toLowerCase().indexOf($scope.search.toLowerCase()) > -1;
                 //Mark this person's last name letter as 'has a match'
                 if (!item.isLetter && itemDoesMatch && !item.favorite) {
                     var letter = item.last_name.charAt(0).toUpperCase();

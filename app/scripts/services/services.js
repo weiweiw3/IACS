@@ -123,7 +123,7 @@
 
                 update: function (opt, messageId, nextAction) {
                     var messageHistoryRef = fbutil.syncData(['messagesHistory', messageId]);
-                    var messageRef = fbutil.syncObject(['messages',messageId]);
+                    var messageRef = fbutil.syncObject(['messages', messageId]);
                     var taskRef = fbutil.syncObject(['tasks', messageId]);
 
                     messageLog.action = nextAction;
@@ -158,7 +158,7 @@
                     }
 
 
-                    function addNewTask(){
+                    function addNewTask() {
                         var d = $q.defer();
                         taskRef.type = nextAction;
                         taskRef.user = currentUser;
@@ -171,6 +171,7 @@
                         );
                         return d.promise;
                     }
+
                     function updateMessageHistory() {
                         var d = $q.defer();
                         messageLog.action = nextAction;
@@ -182,6 +183,7 @@
                         );
                         return d.promise;
                     }
+
                     function lockMessage() {
                         var d = $q.defer();
 //                        messageRef.last = date;
@@ -202,14 +204,13 @@
                     }
 
 
-
                 }
 
             };
             return messageUpdate;
         }]);
     appServices.factory('myMessage', ['$rootScope', 'fbutil',
-        function($rootScope, fbutil) {
+        function ($rootScope, fbutil) {
             var currentUser = $rootScope.auth.user;
             var syncedObject = fbutil.syncObject(['users', currentUser , 'messages']);
             var syncedArray = fbutil.syncArray(['users', currentUser , 'messages']);
@@ -265,12 +266,21 @@
             return myMessages;
         }]);
 
-    appServices.factory('myComponent', ['$rootScope', 'fbutil',
-        function myComponentFactory($rootScope, fbUtil) {
-            var currentUser = $rootScope.auth.user;
-            var syncedArray = fbUtil.syncArray(['users', currentUser, 'components']);
-            var syncedObject = fbUtil.syncObject(['users', currentUser, 'components']);
-            var ref = fbUtil.ref(['users', currentUser, 'components']);
+    appServices.factory('myComponent', ['$rootScope', 'fbutil', 'simpleLogin',
+        function myComponentFactory($rootScope, fbUtil, simpleLogin) {
+//            var currentUser = $rootScope.auth.user;
+
+            var currentUser, authData = $rootScope.auth.$getAuth();
+            if (authData) {
+                console.log("Logged in as:", authData.uid);
+                currentUser = authData.uid;
+            } else {
+                console.log("Logged out");
+            }
+            console.log(currentUser);
+            var syncedArray = fbUtil.syncArray(['users', currentUser, 'messages']);
+            var syncedObject = fbUtil.syncObject(['users', currentUser, 'messages']);
+            var ref = fbUtil.ref(['users', currentUser, 'messages']);
 
             syncedObject.$watch(function (event) {
                 console.log('myComponent', event);

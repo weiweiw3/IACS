@@ -86,7 +86,7 @@ angular.module('firebase.simpleLogin', ['firebase', 'firebase.utils', 'changeEma
 //        function ($firebaseAuth, fbutil, $q, $rootScope,authScopeUtil) {
 
     .factory('simpleLogin', ['$firebaseAuth', 'fbutil', 'createProfile', 'changeEmail',
-                function($firebaseAuth, fbutil, createProfile, changeEmail) {
+        function ($firebaseAuth, fbutil, createProfile, changeEmail) {
 
             var auth = $firebaseAuth(fbutil.ref());
             var listeners = [];
@@ -100,7 +100,7 @@ angular.module('firebase.simpleLogin', ['firebase', 'firebase.utils', 'changeEma
 //                });
 
                 fns.user = auth.$getAuth();
-                angular.forEach(listeners, function(fn) {
+                angular.forEach(listeners, function (fn) {
                     fn(fns.user);
                 });
             }
@@ -149,13 +149,13 @@ angular.module('firebase.simpleLogin', ['firebase', 'firebase.utils', 'changeEma
 //                },
 
 
-                createAccount: function(email, pass, name) {
+                createAccount: function (email, pass, name) {
                     return auth.$createUser({email: email, password: pass})
-                        .then(function() {
+                        .then(function () {
                             // authenticate so we have permission to write to Firebase
                             return fns.login(email, pass);
                         })
-                        .then(function(user) {
+                        .then(function (user) {
                             // store user data in Firebase after creating account
                             return createProfile(user.uid, email, name).then(function () {
                                 return user;
@@ -163,15 +163,15 @@ angular.module('firebase.simpleLogin', ['firebase', 'firebase.utils', 'changeEma
                         });
                 },
 
-                changePassword: function(email, oldpass, newpass) {
+                changePassword: function (email, oldpass, newpass) {
                     return auth.$changePassword({email: email, oldPassword: oldpass, newPassword: newpass});
                 },
 
-                changeEmail: function(password, oldEmail, newEmail) {
+                changeEmail: function (password, oldEmail, newEmail) {
                     return changeEmail(password, oldEmail, newEmail, this);
                 },
 
-                removeUser: function(email, pass) {
+                removeUser: function (email, pass) {
                     return auth.$removeUser({email: email, password: pass});
                 },
 
