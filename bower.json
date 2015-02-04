@@ -2,7 +2,7 @@
   "name": "IACS",
   "version": "0.1.0",
   "dependencies": {
-    "ionic": null,
+    "ionic": "driftyco/ionic-bower#v1.0.0-beta.10",
     "angularfire": null,
     "angular-route": null,
     "underscore": "~1.6.0",

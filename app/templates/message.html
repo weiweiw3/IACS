@@ -2,7 +2,7 @@
     <div class="bar bar-header">
         <a class="button icon ion-navicon" href="#/message/{{message.component}}"> </a>
 
-        <h1 class="title">{{ message.docId }}</h1>
+        <h1 class="title">{{ message.id }}</h1>
 
         <button favorite-message
                 component="message.component"
@@ -33,7 +33,7 @@
         <div class="list" ng-controller="purchaseOrderHeaderCtrl">
 
             <div class="item item-divider">
-                Header{{ message.docId }}
+                Header{{ message.id }}
             </div>
 
             <a ng-repeat="data in syncedData" class="item">

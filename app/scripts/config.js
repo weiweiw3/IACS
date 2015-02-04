@@ -1,6 +1,7 @@
 angular.module('myApp.config', [])
-    .constant('version', '0.1')
+    .constant('version', '1.0')
 
+    .constant('COMPANY', '40288b8147cd16ce0147cd236df20000')
     // end this with a trailing slash
     .constant('FIREBASE_URL', 'https://40288b8147cd16ce0147cd236df20000.firebaseio.com/')
 

@@ -7,7 +7,14 @@
 
     appServices.factory('myContact',
         function ($timeout, $q, $firebase, $rootScope, fbutil) {
-            var currentUser = $rootScope.auth.user;
+//            var currentUser = $rootScope.auth.user;
+            var currentUser, authData = $rootScope.auth.$getAuth();
+            if (authData) {
+                console.log("Logged in as:", authData.uid);
+                currentUser = authData.uid.toString();
+            } else {
+                console.log("Logged out");
+            }
             var myContactRef = fbutil.ref(['users', currentUser, 'contacts']);
             var PublicRef = fbutil.ref(['userList']);
             var sync = $firebase(myContactRef);
@@ -111,7 +118,14 @@
 
     appServices.factory('messageUpdate', ['$rootScope', '$q', 'fbutil', '$timeout',
         function ($rootScope, $q, fbutil, $timeout) {
-            var currentUser = $rootScope.auth.user;
+//            var currentUser = $rootScope.auth.user;
+            var currentUser, authData = $rootScope.auth.$getAuth();
+            if (authData) {
+                console.log("Logged in as:", authData.uid);
+                currentUser = authData.uid.toString();
+            } else {
+                console.log("Logged out");
+            }
             var date = Date.now();
             var messageLog = {
                 action: '',
@@ -211,14 +225,23 @@
         }]);
     appServices.factory('myMessage', ['$rootScope', 'fbutil',
         function ($rootScope, fbutil) {
-            var currentUser = $rootScope.auth.user;
-            var syncedObject = fbutil.syncObject(['users', currentUser , 'messages']);
-            var syncedArray = fbutil.syncArray(['users', currentUser , 'messages']);
+////            var currentUser = $rootScope.auth.user;
+            var currentUser, authData = $rootScope.auth.$getAuth();
+            if (authData) {
+                console.log("Logged in as:", authData.uid);
+                currentUser = authData.uid.toString();
+            } else {
+                console.log("Logged out");
+            }
+
+            var syncedObject = fbutil.syncObject(['users', currentUser , 'messages/E0001']);
+            var syncedArray = fbutil.syncArray(['users', currentUser , 'messages/E0001']);
             var isFavorite = false;
             var myMessages = {
                 array: syncedArray,
                 object: syncedObject,
                 getMessageList: function (componentId) {
+
                     return  fbutil.syncArray(['users', currentUser , 'messages', componentId]);
                 },
 
@@ -226,6 +249,7 @@
 
                     //favorite is optionalArg
                     favorite = (typeof favorite === "undefined") ? "defaultValue" : favorite;
+                    console.log(currentUser,componentId, messageId);
                     var obj = fbutil.syncObject(['users', currentUser ,
                         'messages', componentId, messageId, 'favorite']);
                     if (favorite === "defaultValue") {
@@ -268,22 +292,20 @@
 
     appServices.factory('myComponent', ['$rootScope', 'fbutil', 'simpleLogin',
         function myComponentFactory($rootScope, fbUtil, simpleLogin) {
-//            var currentUser = $rootScope.auth.user;
-
+//            var currentUser=$rootScope.authData.uid;
             var currentUser, authData = $rootScope.auth.$getAuth();
             if (authData) {
                 console.log("Logged in as:", authData.uid);
-                currentUser = authData.uid;
+                currentUser = authData.uid.toString();
             } else {
                 console.log("Logged out");
             }
-            console.log(currentUser);
-            var syncedArray = fbUtil.syncArray(['users', currentUser, 'messages']);
-            var syncedObject = fbUtil.syncObject(['users', currentUser, 'messages']);
-            var ref = fbUtil.ref(['users', currentUser, 'messages']);
+            var syncedArray = fbUtil.syncArray(['users', currentUser, 'components']);
+            var syncedObject = fbUtil.syncObject(['users', currentUser, 'components']);
+            var ref = fbUtil.ref(['users', currentUser, 'components']);
 
             syncedObject.$watch(function (event) {
-                console.log('myComponent', event);
+                console.log('myComponent', event,syncedArray,syncedObject,ref.toString());
                 $rootScope.$broadcast('myComponent.update');
             });
 

@@ -2,7 +2,7 @@ var isAuthenticated = false;
 var dependencyModules = [
     'firebase.routeSecurity-ui-router',
     'firebase.utils',
-    'firebase.utils.old',
+
     'firebase.service.login',
 //  'firebase.simpleLoginTools',
     'firebase.simpleLogin',
@@ -90,6 +90,7 @@ myApp.run(function ($ionicPlatform, $rootScope, FIREBASE_URL, $firebaseAuth, $fi
     $rootScope.$watch('authData', function (value) {
         if (typeof value != 'undefined') {
             isAuthenticated = true;
+
             console.log(value, $rootScope.authData.uid);
         }
 //        else{
