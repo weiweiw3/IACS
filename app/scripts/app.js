@@ -23,6 +23,7 @@ var myAppComponents = [
     'myApp.controllers.chatRoom',
     'myApp.controller.ionic',
     'myApp.controllers.messages',
+    'myApp.controllers.messages1',
     'myApp.services.ionic',
     'myApp.services'
 ];

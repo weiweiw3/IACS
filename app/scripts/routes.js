@@ -27,19 +27,20 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                     authRequired: true,
                     views: {
                         'messages-tab': {
-                            templateUrl: 'templates/message-index.html'
+                            templateUrl: 'templates/messages.html',
+                            controller: 'messagesCtrl'
                         }
                     }
-//                    ,
-//                    resolve: {
-//                        // forces the page to wait for this promise to resolve before controller is loaded
-//                        // the controller can then inject `user` as a dependency. This could also be done
-//                        // in the controller, but this makes things cleaner (controller doesn't need to worry
-//                        // about auth status or timing of displaying its UI components)
-//                        user: ['simpleLogin', function (simpleLogin) {
-//                            return simpleLogin.getUser();
-//                        }]
-//                    }
+                    ,
+                    resolve: {
+                        // forces the page to wait for this promise to resolve before controller is loaded
+                        // the controller can then inject `user` as a dependency. This could also be done
+                        // in the controller, but this makes things cleaner (controller doesn't need to worry
+                        // about auth status or timing of displaying its UI components)
+                        user: ['simpleLogin', function (simpleLogin) {
+                            return simpleLogin.getUser();
+                        }]
+                    }
                 })
 
                 .state('message-detail', {
@@ -74,21 +75,21 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                 })
 
                 // the components tab has its own child nav-view and history
-                .state('tab.components', {
-                    url: '/components',
-                    authRequired: true,
-                    views: {
-                        'components-tab': {
-                            templateUrl: 'templates/components.html',
-                            controller: 'componentsCtrl'
-                        }
-                    }
-                })
+//                .state('tab.components', {
+//                    url: '/components',
+//                    authRequired: true,
+//                    views: {
+//                        'components-tab': {
+//                            templateUrl: 'templates/components.html',
+//                            controller: 'componentsCtrl'
+//                        }
+//                    }
+//                })
 
                 // the setting tab has its own child nav-view and history
                 .state('tab.setting', {
                     url: '/setting',
-                    authRequired: true,
+//                    authRequired: true,
                     views: {
                         'setting-tab': {
                             templateUrl: 'templates/setting.html',
@@ -105,16 +106,26 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                         }
                     }
                 })
+                .state('tab.sap-user-validation', {
+                    url: '/sap-user-validation',
+                    views: {
+                        'setting-tab': {
+                            controller: 'SAPUserValidationCtrl',
+                            templateUrl: 'templates/sap-user-validation.html'
+                        }
+                    }
+                })
             ;
 
             // if none of the above states are matched, use this as the fallback
             //isAuthenticated is set below in the .run() command
             $urlRouterProvider.otherwise(
                 function () {
-
                     if (isAuthenticated) {
+                        console.log('isAuthenticated',isAuthenticated);
                         return '/tab/messages'
                     } else {
+                        console.log('isAuthenticated',isAuthenticated);
                         return '/login'
                     }
                 }
