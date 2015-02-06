@@ -2,7 +2,6 @@ var isAuthenticated = false;
 var dependencyModules = [
     'firebase.routeSecurity-ui-router',
     'firebase.utils',
-
     'firebase.service.login',
 //  'firebase.simpleLoginTools',
     'firebase.simpleLogin',
@@ -19,13 +18,16 @@ var myAppComponents = [
 //  'appServices',
     'myApp.directives',
     'myApp.controllers.setting',
+    'myApp.controllers.login',
+    'myApp.controllers.SAPUserValidation',
     'myApp.controllers.contacts',
     'myApp.controllers.chatRoom',
     'myApp.controller.ionic',
     'myApp.controllers.messages',
     'myApp.controllers.messages1',
     'myApp.services.ionic',
-    'myApp.services'
+    'myApp.services',
+    'myApp.services.auth'
 ];
 
 // Declare app level module which depends on filters, and services

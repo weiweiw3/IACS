@@ -5,11 +5,18 @@
     var appServices = angular.module('myApp.services',
         ['firebase', 'firebase.utils', 'firebase.simpleLogin']);
     appServices.factory('myContact',
-        function ($timeout, $q, $firebase, simpleLogin, $rootScope, syncData) {
+        function ($timeout, $q, $firebase, simpleLogin, $rootScope, fbutil) {
             var currentUser = simpleLogin.user.uid;
-            var myContactRef = syncData(['users', currentUser, 'contacts']);
-            var PublicRef = syncData(['userList']);
-            var sync = myContactRef.$asObject;
+//            var currentUser, authData = $rootScope.auth.$getAuth();
+//            if (authData) {
+//                console.log("Logged in as:", authData.uid);
+//                currentUser = authData.uid.toString();
+//            } else {
+//                console.log("Logged out");
+//            }
+            var myContactRef = fbutil.ref(['users', currentUser, 'contacts']);
+            var PublicRef = fbutil.ref(['userList']);
+            var sync = $firebase(myContactRef);
             var isContact = {};
             var myContacts = {
                 ref: myContactRef,
@@ -107,7 +114,7 @@
             };
             return myContacts;
         });
-    appServices.factory('createTask',
+    appServices.factory('messageUpdate',
         function ($rootScope, $q, syncData, $timeout, simpleLogin) {
             var currentUser = simpleLogin.user.uid;
             var date = Date.now();
@@ -116,38 +123,14 @@
                 user: currentUser,
                 date: date
             };
-            var taskDefaultRefStr='CompanySetting/EventDefaltValues';
-            var createTask;
-            createTask = {
-                getInputP: function (event) {
-                    return syncData([taskDefaultRefStr, event, 'inputParas'])
-                        .$asObject();
-                },
-                checkLock: function(){
+            var publicMessageRef = syncData(['messages']);
+            var messageUpdate = {
 
-                    function checkLocked(ref) {
-                        var d = $q.defer();
+                update: function (opt, messageId, nextAction) {
 
-                        ref.$ref().once('value', function (snap) {
-                            if (snap.val() === true) {
-                                console.log('true',snap.val());
-
-                                d.reject();
-                                opt.pass(false);
-                            } else {
-                                console.log('false',snap.val());
-                                d.resolve();
-                            }
-                        });
-                        return d.promise;
-                    }
-                },
-
-                create: function (opt, messageId, nextAction, inputPStr, event) {
-                    var self=this;
-                    var logRef = syncData(['users', currentUser, 'log', event, messageId]);
-                    var lockRef = syncData(['users', currentUser, 'log', event,messageId,'lock']);
-                    var taskRef = syncData(['tasks']);
+                    var messageHistoryRef = syncData(['messagesHistory', messageId]);
+                    var messageRef = syncData(['messages', messageId]).$asObject();
+                    var taskRef = syncData(['tasks', messageId]).$asObject();
 
                     messageLog.action = nextAction;
                     var cb = opt.callback || function () {
@@ -157,22 +140,21 @@
                             cb(err);
                         });
                     };
-
                     //promise process
-                    var promise=checkLocked(lockRef);
-                    promise
-                        .then(addNewTask(taskRef, inputPStr,event,currentUser))
-                        .then(log4task(logRef,event))
-                        .then(lockMessage(lockRef))
+//                    checkLocked()->log4task()
+                    checkLocked()
+                        .then(addNewTask)
+                        .then(log4task)
+                        .then(lockMessage)
                         // success
                         .then(function () {
                             cb && cb(null)
                         }, cb)
                         .catch(errorFn);
-                    function checkLocked(ref) {
+                    function checkLocked() {
                         var d = $q.defer();
-                        ref.$ref().once('value', function (snap) {
-                            if (snap.val() === true) {
+                        publicMessageRef.child(messageId).once('value', function (snap) {
+                            if (snap.locked === true && snap.lockedBy !== currentUser) {
                                 d.reject();
                             } else {
                                 d.resolve();
@@ -181,46 +163,42 @@
                         return d.promise;
                     }
 
-                    function addNewTask(taskRef, inputP, event, userid) {
-
+                    function addNewTask() {
                         var d = $q.defer();
-                        var taskDataObj=syncData([taskDefaultRefStr, event]);
-                        var taskDataRef=taskDataObj.$ref();
-
-                        taskDataRef.on("value", function(snap) {
-                            var data=snap.val();
-                            data.inputParas = '';
-                            taskRef.$push(data).then(
-                                function (ref) {
-                                    inputP=inputP+ref.key();
-                                    ref.child('inputParas').set(inputP);
-                                    d.resolve();
-                                }, function (error) {
-                                    d.reject(error);
-                                    console.log("Error:", error);
-                                });
-                        });
-                        return d.promise;
-                    }
-
-                    function log4task(logRef, event) {
-                        var ref = logRef;
-                        var d = $q.defer();
-                        messageLog.action = event;
-                        ref.$push(messageLog).then(
+                        taskRef.type = nextAction;
+                        taskRef.user = currentUser;
+                        taskRef.date = date;
+                        taskRef.$save().then(
                             function (ref) {
-                                console.log(ref.key());   // Key for the new ly created record
+                                console.log(ref.name());   // Key for the new ly created record
                                 d.resolve();
-                            }, function (error) {
-                                console.log("Error:", error);
-                            });
+                            }
+                        );
                         return d.promise;
                     }
 
-                    function lockMessage(lockref) {
-                        var ref = lockref;
+                    function log4task() {
                         var d = $q.defer();
-                        ref.$set(true)
+                        messageLog.action = nextAction;
+                        messageHistoryRef.$push(messageLog).then(
+                            function (ref) {
+                                console.log(ref.name());   // Key for the new ly created record
+                                d.resolve();
+                            }
+                        );
+                        return d.promise;
+                    }
+
+                    function lockMessage() {
+                        var d = $q.defer();
+//                        messageRef.last = date;
+//                        messageRef.statusNext = messageRef.statusCur;
+//                        messageRef.statusCur = messageRef.statusPre;
+//                        messageRef.userTo = messageRef.userFrom;
+                        messageRef.locked = true;
+                        messageRef.lockedBy = currentUser;
+                        messageRef.lockedDate = date;
+                        messageRef.$save()
                             .then(
                             function () {
                                 opt.pass(true);
@@ -230,10 +208,14 @@
                         return d.promise;
                     }
                 }
-            };
-            return createTask;
-        });
 
+            };
+            return messageUpdate;
+        });
+    appServices.factory('createTask', ['$rootScope', 'fbutil', 'simpleLogin',
+        function ($rootScope, fbutil, simpleLogin) {
+            //TODO
+        }]);
 
     //functions:
     // 1, get message list with componentID
@@ -243,8 +225,8 @@
 
             var currentUser = simpleLogin.user.uid;
             var isFavorite = false;
-            var messageMetadataRefStr = 'users/' + currentUser + '/messageMetadata';
-            var MessageRefStr = 'users/' + currentUser + '/messages';
+            var messageMetadataRefStr = 'users/'+ currentUser + '/messageMetadata';
+            var MessageRefStr = 'users/'+ currentUser + '/messages';
 
             var myMessages = {
                 getMessageList: function (componentId) {
@@ -295,13 +277,13 @@
     //get component information, and update unread number
     //ref sample: users/simplelogin%3A33/components/E0001
     appServices.factory('myComponent', ['$rootScope', 'syncData', 'simpleLogin',
-        function ($rootScope, syncData, simpleLogin) {
+        function ($rootScope, syncData,simpleLogin) {
 
             var currentUser = simpleLogin.user.uid;
             var ref = syncData(['users', currentUser, 'components']);
             var syncedArray = ref.$asArray();
             var syncedObject = ref.$asObject();
-            var unreadCountRefStr = 'users/' + currentUser + '/components/$componentId$/unreadCount';
+            var unreadCountRefStr = 'users/'+currentUser+'/components/$componentId$/unreadCount';
 
             syncedObject.$watch(function (event) {
 //                console.log('myComponent', event, syncedArray, syncedObject, ref.toString());
@@ -313,7 +295,7 @@
                 array: syncedArray,
                 object: syncedObject,
                 UnreadCountMinus: function (componentId) {
-                    unreadCountRefStr = unreadCountRefStr.replace('$componentId$', componentId);
+                    unreadCountRefStr=unreadCountRefStr.replace('$componentId$',componentId);
                     var ref = syncData(unreadCountRefStr);
                     ref.$transaction(function (currentCount) {
                         if (!currentCount) return 1;   // Initial value for counter.

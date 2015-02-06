@@ -12,45 +12,46 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                 .state('login', {            // setup an login page
                     url: "/login",
                     templateUrl: "templates/login.html",
-                    controller: 'LoginCtrl'
+                    controller: 'loginCtrl'
                 })
 
                 .state('tab', {            // setup an abstract state for the tabs directive
                     url: "/tab",
-                    authRequired: true,
+//                    authRequired: true,
                     abstract: true,
                     templateUrl: "templates/tabs.html"
                 })
 
                 .state('tab.messages', {            // the message tab has its own child nav-view and history
                     url: '/messages',
-                    authRequired: true,
+//                    authRequired: true,
                     views: {
                         'messages-tab': {
                             templateUrl: 'templates/messages.html',
                             controller: 'messagesCtrl'
                         }
                     }
-                    ,
-                    resolve: {
-                        // forces the page to wait for this promise to resolve before controller is loaded
-                        // the controller can then inject `user` as a dependency. This could also be done
-                        // in the controller, but this makes things cleaner (controller doesn't need to worry
-                        // about auth status or timing of displaying its UI components)
-                        user: ['simpleLogin', function (simpleLogin) {
-                            return simpleLogin.getUser();
-                        }]
-                    }
+//                    ,
+//                    resolve: {
+//                        // forces the page to wait for this promise to resolve before controller is loaded
+//                        // the controller can then inject `user` as a dependency. This could also be done
+//                        // in the controller, but this makes things cleaner (controller doesn't need to worry
+//                        // about auth status or timing of displaying its UI components)
+//                        user: ['simpleLogin', function (simpleLogin) {
+//                            return simpleLogin.getUser();
+//                        }]
+//                    }
                 })
 
-                .state('message-detail', {
+                .state('message-list', {
                     url: '/message/:component',
-                    templateUrl: 'templates/message-detail.html'
-
+                    templateUrl: 'templates/message-list.html',
+                    controller: 'messageListCtrl'
                 })
                 .state('message', {
                     url: '/message',
-                    templateUrl: 'templates/message.html'
+                    templateUrl: 'templates/message.html',
+                    controller: 'messageHeaderCtrl'
 
                 })
                 .state('components-management', {
@@ -61,7 +62,7 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                 // the contacts tab has its own child nav-view and history
                 .state('tab.contacts', {
                     url: '/contacts',
-                    authRequired: false,
+//                    authRequired: false,
                     views: {
                         'contacts-tab': {
                             templateUrl: 'templates/contacts.html'
@@ -92,8 +93,9 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
 //                    authRequired: true,
                     views: {
                         'setting-tab': {
-                            templateUrl: 'templates/setting.html',
-                            controller: 'LoginCtrl'
+                            templateUrl: 'templates/setting.html'
+//                            ,
+//                            controller: 'loginCtrl'
                         }
                     }
                 })
@@ -101,7 +103,7 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                     url: '/myprofile',
                     views: {
                         'setting-tab': {
-                            authRequired: true,
+//                            authRequired: true,
                             templateUrl: 'templates/profile-detail.html'
                         }
                     }

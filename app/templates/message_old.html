@@ -14,6 +14,16 @@
     <ion-content>
         <ion-list>
             <ion-item type="item-text-wrap">
+                {{ 'userFrom:' + message.userFrom}}
+                <add-contact contact-id="message.userFrom">
+                </add-contact>
+            </ion-item>
+            <ion-item type="item-text-wrap">
+                {{ 'userTo:' + message.userTo}}
+                <add-contact contact-id="message.userTo">
+                </add-contact>
+            </ion-item>
+            <ion-item type="item-text-wrap">
                 <reset message="message">
                 </reset>
                 <next message="message">
@@ -28,11 +38,11 @@
                 {{ data.$id+': '+data.$value }}
             </a>
         </div>
-        <div class="list" ng-controller="messageItemCtrl">
+        <div class="list" ng-controller="purchaseOrderItemCtrl">
             <div class="item item-divider">
                 Items
             </div>
-            <a ng-repeat="data in syncedItemStart" class="item">
+            <a ng-repeat="data in syncedData" class="item">
                 {{ data }}
             </a>
             <button ng-hide="isloaded" class="button button-full button-stable" ng-click="loadingMore()">

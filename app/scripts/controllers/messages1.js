@@ -26,29 +26,37 @@ angular.module('myApp.controllers.messages1', [])
         });
     })
 
-    //for message-detail.html
-    .controller('myMessageListlCtrl', function
+    //for message-list.html
+    //get message list with factory myMessage
+    //update unread number with factory myComponent
+    .controller('messageListCtrl', function
         (myComponent, myMessage, $stateParams, $location, $timeout, $scope, ionicLoading) {
 
         $scope.component = $stateParams.component;
 
         $scope.messages = myMessage.getMessageList($scope.component);
+
         ionicLoading.load();
 
         $scope.messages.$loaded().then(function () {
             ionicLoading.unload();
         });
+
         $scope.goDetail = function (key) {
             $scope.messages[key].read = false;
             $scope.messages.$save(key).then(function () {
+
                 myComponent.UnreadCountMinus($scope.component);
+
                 $location.path('/message').search({
                     'key': $scope.messages[key].$id,
                     'component': $scope.component
                 });
+
             });
 
         };
+
         $scope.order = function (predicate, reverse) {
             $scope.messages = orderBy($scope.messages, predicate, reverse);
         };
@@ -56,34 +64,24 @@ angular.module('myApp.controllers.messages1', [])
 
     //for message.html
     .controller('messageHeaderCtrl',
-    function ($location, $log, $timeout, $scope, syncData, ionicLoading,$rootScope,fbutil) {
+    function ($location, $log, $timeout, $scope, syncData, ionicLoading, simpleLogin) {
 
-        var currentUser, authData = $rootScope.auth.$getAuth();
-        if (authData) {
-            console.log("Logged in as:", authData.uid);
-            currentUser = authData.uid.toString();
-        } else {
-            console.log("Logged out");
-        }
+        var currentUser = simpleLogin.user.uid;
         var params = $location.search();
         var messageId = params.key;
-        var component =params.component;
-        var ctrlName = 'messageHeaderCtrl' ;
+        var component = params.component;
+        var ctrlName = 'messageHeaderCtrl';
+        var messageRef = $scope.messageRef = 'users' + '/' + currentUser + '/' + 'messages' + '/' + component + '/' + messageId;
+        var metadataRef = $scope.metadataRef = 'users' + '/' + currentUser + '/' + 'messageMetadata' + '/' + component + '/' + messageId;
 
         $scope.$log = $log;
-        $scope.syncedData = syncData(['users',currentUser,'messages', component,messageId])
-                                .$asObject();
-        $scope.syncedMetaData = syncData(['users',currentUser,'messages',
-            component,messageId,'metadata']).$asArray();
+        $scope.syncedData = syncData([messageRef, 'data']).$asObject();
 
-        $scope.syncedItemStart = syncData(['users',currentUser,'messages',
-            component,messageId,'items']).$asArray();//startAt:null,limit: 3,endAt: [1,'1']
+        $scope.syncedMetaData = syncData([metadataRef]).$asArray();
 
-//        $scope.syncedItemStart = fbutil.syncArray(['users',currentUser,'messages',
-//            component,messageId,'items'], {startAt: '0', limit: 3});//startAt:null,limit: 3,endAt: [1,'1']
+        $scope.syncedItemStart = syncData([messageRef, 'items']).$asArray();//startAt:1,limit: 5
 
-        $scope.syncedItemContinue = fbutil.syncArray(['users',currentUser,'messages',
-            component,messageId,'items'], {startAt: '3'});//startAt 3
+        $scope.syncedItemContinue = syncData([messageRef, 'moreItems']).$asArray();//startAt 6
 
         $scope.syncedData.$watch(function (data) {
 
@@ -91,7 +89,7 @@ angular.module('myApp.controllers.messages1', [])
             $scope.syncedData.$loaded()
                 .then(function (data) {
                     $scope.message = data;//all the data in the scope are from here.
-                    $scope.message.id = data.$id;
+//                    $scope.message.id = data.$id;
                     angular.forEach($scope.message, function (value, key) {
                         if (!key.indexOf('$')) {
                             delete $scope.message[key];
@@ -113,72 +111,37 @@ angular.module('myApp.controllers.messages1', [])
         });
 
     })
-    .controller('purchaseOrderHeaderCtrl',
-    function ($location, $timeout, $scope, fbutil, ionicLoading) {
+
+    .controller('messageItemCtrl',
+    function ($location, $timeout, $scope, syncData, ionicLoading) {
         ionicLoading.load();
-        $scope.$parent.$watch('message.id', function (newVal) {
-            if (angular.isUndefined(newVal) || newVal == null) {
-                return
-            }
+        var messageRef = $scope.$parent.messageRef;
 
-            $scope.syncedData=$scope.$parent.syncedMetaData;
-//            $scope.syncedData = fbutil.syncArray(['metadata', 'purchaseOrderHeader',
-//                newVal]);
+        $scope.syncedItemStart = syncData([messageRef, 'items']).$asArray();//startAt:1,limit: 5
 
-            $scope.syncedData.$loaded()
-                .then(ionicLoading.unload());
-//
-        });
-    })
-    .controller('purchaseOrderItemCtrl',
-    function ($location, $timeout, $scope, fbutil, ionicLoading) {
+        $scope.syncedItemStart.$loaded()
+            .then(ionicLoading.unload());
 
-        ionicLoading.load();
-        $scope.$parent.$watch('message.id', function (newVal) {
-            if (angular.isUndefined(newVal) || newVal == null) {
-                return
-            }
-//            $scope.syncedData = fbutil.syncArray(['metadata', 'purchaseOrderItem',
-//                newVal], {startAt: '0', limit: 3});//startAt:null,limit: 3,endAt: [1,'1']
-            $scope.syncedData=$scope.$parent.syncedItemStart;
-            $scope.syncedData.$loaded()
-                .then(function (data) {
-
-                })
-                .then(ionicLoading.unload());
-//
-        });
         $scope.isloaded = false;
+
         $scope.loadText = 'more items';
+
         $scope.loadingMore = function () {
-
             $scope.toLoad = true;
-
         };
+
         $scope.$watch('toLoad', function (newVal) {
             if (newVal === true) {
                 $scope.loadText = 'loading';
-
                 ionicLoading.load();
-                $scope.$parent.$watch('message.id', function (newVal) {
-                    if (angular.isUndefined(newVal) || newVal == null) {
-                        return
-                    }
-//                    $scope.continued = fbutil.syncArray(['metadata', 'purchaseOrderItem',
-//                        newVal], {startAt: '3'});//startAt
-                    $scope.continued = $scope.$parent.syncedItemContinue;
-                    $scope.continued.$loaded()
-                        .then($scope.isloaded = true)
-                        .then(ionicLoading.unload());
-//
-                });
-
+                $scope.continued = syncData([messageRef, 'moreItems']).$asArray();//startAt 6
+                $scope.continued.$loaded()
+                    .then($scope.isloaded = true)
+                    .then(ionicLoading.unload());
 
             }
         });
     })
-
-
 
     .controller("SampleCtrl", ["$scope", "$timeout", function ($scope, $timeout) {
         // create a Firebase reference

@@ -89,6 +89,7 @@ angular.module('firebase.simpleLogin', ['firebase', 'firebase.utils', 'changeEma
         function ($firebaseAuth, fbutil, createProfile, changeEmail) {
 
             var auth = $firebaseAuth(fbutil.ref());
+
             var listeners = [];
 
             function statusChange() {
