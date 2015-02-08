@@ -1,0 +1,18 @@
+<div >
+    <div class="bar bar-header">
+        <a class="button icon-left ion-chevron-left button-clear button-dark"
+           href="#/tab/messages">Back</a>
+        <h1 class="title">{{ component }}</h1>
+    </div>
+    <ion-content>
+        <ion-list>
+            <ion-item type="item-text-wrap" ng-repeat="(key, value) in messages "
+                      ng-click="goDetail(key)">
+                <h3>{{ value.$id }}{{ value }} </h3>
+                <span class="item-note" am-time-ago="value.doc_DATE"></span>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</div>
+
+
