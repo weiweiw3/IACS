@@ -17,17 +17,22 @@ var myAppComponents = [
     'myApp.filters',
 //  'appServices',
     'myApp.directives',
+    'myApp.directives.favoriteMessage',
     'myApp.controllers.setting',
     'myApp.controllers.login',
     'myApp.controllers.SAPUserValidation',
     'myApp.controllers.contacts',
     'myApp.controllers.chatRoom',
     'myApp.controller.ionic',
-    'myApp.controllers.messages',
+    'myApp.controllers.messagesIndex',
+    'myApp.controllers.messagesInOneComponent',
+    'myApp.controllers.messagesDetail',
     'myApp.controllers.messages1',
     'myApp.services.ionic',
     'myApp.services',
-    'myApp.services.auth'
+    'myApp.services.auth',
+    'myApp.services.myComponent',
+    'myApp.services.myMessage'
 ];
 
 // Declare app level module which depends on filters, and services

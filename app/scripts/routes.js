@@ -27,8 +27,8 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
 //                    authRequired: true,
                     views: {
                         'messages-tab': {
-                            templateUrl: 'templates/messages.html',
-                            controller: 'messagesCtrl'
+                            templateUrl: 'templates/messages-index.html',
+                            controller: 'messagesIndexCtrl'
                         }
                     }
 //                    ,
@@ -46,7 +46,7 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                 .state('message-list', {
                     url: '/message/:component',
                     templateUrl: 'templates/message-list.html',
-                    controller: 'messageListCtrl'
+                    controller: 'messagesInOneComponentCtrl'
                 })
                 .state('message', {
                     url: '/message',

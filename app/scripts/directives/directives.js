@@ -7,51 +7,7 @@ angular.module('myApp.directives', [])
             elm.text(version);
         };
     }])
-    .directive('favoriteMessage', function ($rootScope, myMessage, $animate, ionicLoading) {
-        return {
-            restrict: "EA",
-            scope: {
-                component: "=",
-                messageId: "="
-            },
-            replace: true,
-            link: function ($scope, element, attrs) {
-                var favorite = false;
-                $scope.$on('isFavorite.update', function (event) {
 
-                    favorite = myMessage.isFavorite($scope.messageId);
-
-                    if (typeof favorite == "boolean") {
-                        ionicLoading.unload();
-                        $scope.favorite = favorite;
-                        toggleFavorite($scope.favorite);
-                    }
-
-                });
-                $scope.$watch('messageId', function (newVal) {
-                    if (angular.isUndefined(newVal) || newVal == null) {
-                        return
-                    }
-                    myMessage.getFavorite($scope.component, newVal);
-                });
-
-                function toggleFavorite(isFavorite) {
-                    if (isFavorite) {
-                        $animate.setClass(element, 'ion-star', 'ion-ios7-star-outline');
-                    } else {
-                        $animate.setClass(element, 'ion-ios7-star-outline', 'ion-star');
-                    }
-                }
-
-                element.on('click', function () {
-                    favorite = !favorite;
-                    ionicLoading.load();
-                    myMessage.getFavorite($scope.component, $scope.messageId, favorite);
-                });
-
-            }
-        };
-    })
     .directive('addContact', function (simpleLogin,$rootScope, myContact, $q, $animate, ionicLoading) {
 
         var currentUser = simpleLogin.user.uid;
@@ -131,7 +87,7 @@ angular.module('myApp.directives', [])
     .directive('reset', function (simpleLogin,$rootScope,
                                   createTask, $q, $animate, ionicLoading) {
 
-//  TODO: create E002 inputP
+//  TODO: create E0002 inputP
 //  inputP: CompanySetting/EventDefaltValues/E0002
 //        "PO_REL_CODE=$P01$;
 //        PURCHASEORDER=$P02$;
@@ -160,10 +116,13 @@ angular.module('myApp.directives', [])
                     }
                 );
                 $scope.$watch('message', function (newVal) {
+
                     if (angular.isUndefined(newVal) || newVal == null) {
                         return
+                    }else{
+                        console.log(newVal);
                     }
-                    if (newVal.locked == true) {
+                    if (newVal.lock == true) {
                         $scope.isDisabled = true;
                         $scope.btnText = 'SEND OUT';
                     } else {

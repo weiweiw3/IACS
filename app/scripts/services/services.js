@@ -146,7 +146,7 @@
                 create: function (opt, messageId, nextAction, inputPStr, event) {
                     var self=this;
                     var logRef = syncData(['users', currentUser, 'log', event, messageId]);
-                    var lockRef = syncData(['users', currentUser, 'log', event,messageId,'lock']);
+                    var lockRef = syncData(['users', currentUser, 'messages', 'E0001',messageId,'lock']);
                     var taskRef = syncData(['tasks']);
 
                     messageLog.action = nextAction;
@@ -235,103 +235,7 @@
         });
 
 
-    //functions:
-    // 1, get message list with componentID
-    // 2, get and update favorite
-    appServices.factory('myMessage', ['$rootScope', 'syncData', 'simpleLogin',
-        function ($rootScope, syncData, simpleLogin) {
 
-            var currentUser = simpleLogin.user.uid;
-            var isFavorite = false;
-            var messageMetadataRefStr = 'users/' + currentUser + '/messageMetadata';
-            var MessageRefStr = 'users/' + currentUser + '/messages';
-
-            var myMessages = {
-                getMessageList: function (componentId) {
-                    return  syncData([messageMetadataRefStr, componentId]).$asArray();
-                },
-                getFavorite: function (componentId, messageId, favorite) {
-                    //favorite is optionalArg
-                    favorite = (typeof favorite === "undefined") ? "defaultValue" : favorite;
-
-                    var obj = syncData([MessageRefStr, componentId, messageId, 'favorite'])
-                        .$asObject();
-
-                    if (favorite === "defaultValue") {
-                        // load favorite from server
-                        obj.$loaded().then(function (data) {
-                            isFavorite = {
-                                messageId: messageId,
-                                favorite: data.$value
-                            };
-                            $rootScope.$broadcast('isFavorite.update');
-                        });
-                    } else {
-                        //update favorite in server
-                        obj.$value = favorite;
-                        obj.$save().then(function (ref) {
-                            isFavorite = {
-                                messageId: messageId,
-                                favorite: obj.$value
-                            };
-                            $rootScope.$broadcast('isFavorite.update');
-                        });
-                    }
-
-                },
-                isFavorite: function (messageId) {
-                    if (messageId === isFavorite.messageId) {
-                        return isFavorite.favorite;
-                    } else {
-                        return 'error'
-                    }
-
-                }
-
-            };
-            return myMessages;
-        }]);
-
-    //get component information, and update unread number
-    //ref sample: users/simplelogin%3A33/components/E0001
-    appServices.factory('myComponent', ['$rootScope', 'syncData', 'simpleLogin',
-        function ($rootScope, syncData, simpleLogin) {
-
-            var currentUser = simpleLogin.user.uid;
-            var ref = syncData(['users', currentUser, 'components']);
-            var syncedArray = ref.$asArray();
-            var syncedObject = ref.$asObject();
-            var unreadCountRefStr = 'users/' + currentUser + '/components/$componentId$/unreadCount';
-
-            syncedObject.$watch(function (event) {
-//                console.log('myComponent', event, syncedArray, syncedObject, ref.toString());
-                $rootScope.$broadcast('myComponent.update');
-            });
-
-            var myComponent = {
-                all: ref,
-                array: syncedArray,
-                object: syncedObject,
-                UnreadCountMinus: function (componentId) {
-                    unreadCountRefStr = unreadCountRefStr.replace('$componentId$', componentId);
-                    var ref = syncData(unreadCountRefStr);
-                    ref.$transaction(function (currentCount) {
-                        if (!currentCount) return 1;   // Initial value for counter.
-                        if (currentCount < 0) return;  // Return undefined to abort transaction.
-                        return currentCount - 1;             // Increment the count by 1.
-                    }).then(function (snapshot) {
-                        if (!snapshot) {
-                            // Handle aborted transaction.
-                        } else {
-                            // Do something.
-                        }
-                    }, function (err) {
-                        // Handle the error condition.c
-                    });
-                }
-            };
-            return myComponent;
-        }]);
 
 
     appServices.factory('disposeOnLogout', ['$rootScope', function ($rootScope) {
