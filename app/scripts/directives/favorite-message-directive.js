@@ -12,9 +12,15 @@ angular.module('myApp.directives.favoriteMessage', [])
             replace: true,
             link: function ($scope, element, attrs) {
                 var favorite = false;
-                $scope.$on('isFavorite.update', function (event) {
+                $scope.$watch('messageId', function (newVal) {
+                    if (angular.isUndefined(newVal) || newVal == null) {
+                        return
+                    }
+                    myMessage.markStatus($scope.component,$scope.messageId, 'favorite');
+                });
+                $scope.$on('favorite.update', function (event) {
 
-                    favorite = myMessage.isFavorite($scope.messageId);
+                    favorite = myMessage.getStatus($scope.component,$scope.messageId, 'favorite');
 
                     if (typeof favorite == "boolean") {
                         ionicLoading.unload();
@@ -23,13 +29,6 @@ angular.module('myApp.directives.favoriteMessage', [])
                     }
 
                 });
-                $scope.$watch('messageId', function (newVal) {
-                    if (angular.isUndefined(newVal) || newVal == null) {
-                        return
-                    }
-                    myMessage.getFavorite($scope.component, newVal);
-                });
-
                 function toggleFavorite(isFavorite) {
                     if (isFavorite) {
                         $animate.setClass(element, 'ion-star', 'ion-ios7-star-outline');
@@ -41,7 +40,8 @@ angular.module('myApp.directives.favoriteMessage', [])
                 element.on('click', function () {
                     favorite = !favorite;
                     ionicLoading.load();
-                    myMessage.getFavorite($scope.component, $scope.messageId, favorite);
+                    myMessage.markStatus($scope.component,$scope.messageId, 'favorite',favorite);
+
                 });
 
             }

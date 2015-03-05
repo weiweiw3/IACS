@@ -18,6 +18,7 @@ var myAppComponents = [
 //  'appServices',
     'myApp.directives',
     'myApp.directives.favoriteMessage',
+    'myApp.directives.createTask',
     'myApp.controllers.setting',
     'myApp.controllers.login',
     'myApp.controllers.SAPUserValidation',
@@ -32,7 +33,9 @@ var myAppComponents = [
     'myApp.services',
     'myApp.services.auth',
     'myApp.services.myComponent',
-    'myApp.services.myMessage'
+    'myApp.services.myMessage',
+    'myApp.services.myTask',
+    'myApp.services.myUser'
 ];
 
 // Declare app level module which depends on filters, and services

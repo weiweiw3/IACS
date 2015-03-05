@@ -7,33 +7,49 @@ angular.module('myApp.controllers.messagesInOneComponent', [])
     //update unread number with factory myComponent
     .controller('messagesInOneComponentCtrl', function
         (myComponent, myMessage, $stateParams, $location, $timeout, $scope, ionicLoading) {
-
-        $scope.component = $stateParams.component;
-
-        $scope.messages = myMessage.getMessageList($scope.component);
+        var componentId = $scope.component = $stateParams.component;
+        var messageId;
+        myComponent.getmessageList($scope.component);
 
         ionicLoading.load();
 
-        $scope.messages.$loaded().then(function () {
+        $scope.$on('messages.ready', function (event) {
+            $scope.messages = myComponent.messagesArray($scope.component);
+        });
+
+        $scope.$watch('messages',function (newVal) {
+            if (angular.isUndefined(newVal) || newVal == null) {
+                return
+            }
+            console.log($scope.messages);
             ionicLoading.unload();
         });
 
-        $scope.goDetail = function (key) {
-            $scope.messages[key].read = false;
-            $scope.messages.$save(key).then(function () {
 
-                myComponent.UnreadCountMinus($scope.component);
+        $scope.goDetail = function (key,read) {
+            messageId=key;
+            if(!read)
+            {
+                myMessage.markStatus(componentId,messageId,'read',true)
+            }else{
+                navigate(componentId,messageId);
+            }
 
-                $location.path('/message').search({
-                    'key': $scope.messages[key].$id,
-                    'component': $scope.component
-                });
-
+        };
+        function navigate(componentId,messageId){
+            $location.path('/message').search({
+                'key': messageId,
+                'component': componentId
             });
+        }
+        $scope.$on('read.update', function (event) {
+            var read = myMessage.getStatus(componentId,messageId,'read');
+            myComponent.UnreadCountMinus(componentId);
+            navigate(componentId,messageId);
 
-        };
-
-        $scope.order = function (predicate, reverse) {
-            $scope.messages = orderBy($scope.messages, predicate, reverse);
-        };
+        });
+//        $scope.predicate = 'favorite';
+//        $scope.order = function (predicate, reverse) {
+//            $scope.messages = orderBy($scope.messages, 'favorite', reverse);
+//        };
     });

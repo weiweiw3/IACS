@@ -8,23 +8,21 @@ angular.module('myApp.services.myMessage', ['firebase', 'firebase.utils', 'fireb
     // 2, get and update favorite
 .factory('myMessage', ['$rootScope', 'syncData', 'simpleLogin',
     function ($rootScope, syncData, simpleLogin) {
-
         var currentUser = simpleLogin.user.uid;
-        var isFavorite = false;
-        var messageMetadataRefStr = 'users/' + currentUser + '/messageMetadata';
+        var statusObj;
         var MessageRefStr = 'users/' + currentUser + '/messages';
 
         var myMessages = {
-            getMessageList: function (componentId) {
-                return  syncData([messageMetadataRefStr, componentId]).$asArray();
-            },
+
             getMessageMetadata: function (componentId,messageId) {
-                return  syncData([messageMetadataRefStr, componentId,messageId]).$asArray();
+                return  syncData([MessageRefStr, componentId,messageId,'data/metadata']).$asArray();
             },
             getMessageHeader: function (componentId,messageId) {
                 return  syncData([MessageRefStr, componentId,messageId,'data']).$asObject();
             },
-
+            getMessageHeaderArray: function (componentId,messageId) {
+                return  syncData([MessageRefStr, componentId,messageId,'data']).$asArray();
+            },
             //startAtItems:1,limit: 5
             getMessageItems: function (componentId,messageId) {
                 return  syncData([MessageRefStr, componentId,messageId,'items']).$asArray();
@@ -34,43 +32,48 @@ angular.module('myApp.services.myMessage', ['firebase', 'firebase.utils', 'fireb
             getMessageMoreItems: function (componentId,messageId) {
                 return  syncData([MessageRefStr, componentId,messageId,'moreItems']).$asArray();
             },
+            markStatus: function(componentId, messageId,status,statusValue){
+                //statusValue is optionalArg
+                statusValue = (typeof statusValue === "undefined")
+                    ? "defaultValue" : statusValue;
 
-            getFavorite: function (componentId, messageId, favorite) {
-                //favorite is optionalArg
-                favorite = (typeof favorite === "undefined") ? "defaultValue" : favorite;
-
-                var obj = syncData([MessageRefStr, componentId, messageId, 'data','favorite'])
+                var obj = syncData([MessageRefStr, componentId, messageId, 'data',status])
                     .$asObject();
 
-                if (favorite === "defaultValue") {
-                    // load favorite from server
+                if (statusValue === "defaultValue") {
+                    // load statusValue from firebase
                     obj.$loaded().then(function (data) {
-                        isFavorite = {
+                        statusObj = {
+                            componentId:componentId,
                             messageId: messageId,
-                            favorite: data.$value
+                            status:status,
+                            statusValue: data.$value
                         };
-                        $rootScope.$broadcast('isFavorite.update');
+                        $rootScope.$broadcast(status+'.update');
                     });
                 } else {
-                    //update favorite in server
-                    obj.$value = favorite;
-                    obj.$save().then(function (ref) {
-                        isFavorite = {
+                    //update statusValue in firebase
+                    obj.$value = statusValue;
+                    obj.$save().then(function () {
+                        statusObj = {
+                            componentId:componentId,
                             messageId: messageId,
-                            favorite: obj.$value
+                            status:status,
+                            statusValue: statusValue
                         };
-                        $rootScope.$broadcast('isFavorite.update');
+                        $rootScope.$broadcast(status+'.update');
                     });
                 }
-
             },
-            isFavorite: function (messageId) {
-                if (messageId === isFavorite.messageId) {
-                    return isFavorite.favorite;
+            getStatus: function (componentId,messageId,status) {
+                if ( componentId=== statusObj.componentId
+                    && messageId === statusObj.messageId
+                    && status === statusObj.status)
+                {
+                    return statusObj.statusValue;
                 } else {
                     return 'error'
                 }
-
             }
 
         };
