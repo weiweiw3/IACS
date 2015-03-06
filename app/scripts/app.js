@@ -1,8 +1,6 @@
 var isAuthenticated = false;
 var dependencyModules = [
-    'firebase.routeSecurity-ui-router',
     'firebase.utils',
-//    'firebase.service.login',
     'firebase.simpleLogin',
     'firebase',
     'ionic',
@@ -41,8 +39,7 @@ var myAppComponents = [
 var myApp = angular.module('starter', dependencyModules.concat(myAppComponents));
 
 // do all the things ionic needs to get going
-myApp.run(function ($ionicPlatform, $rootScope,
-                    FIREBASE_URL, $firebaseAuth, $firebase, $window, $location,$ionicLoading) {
+myApp.run(function ($ionicPlatform, $rootScope, FIREBASE_URL, $firebaseAuth, $firebase, $window, $location, $ionicLoading) {
     $ionicPlatform.ready(function (simpleLogin) {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -56,16 +53,16 @@ myApp.run(function ($ionicPlatform, $rootScope,
         $rootScope.userEmail = null;
         $rootScope.baseUrl = FIREBASE_URL;
         var authRef = new Firebase($rootScope.baseUrl);
-       $rootScope.auth = $firebaseAuth(authRef);
+        $rootScope.auth = $firebaseAuth(authRef);
 //        $rootScope.auth =simpleLogin.auth;
         $rootScope.auth.$onAuth(function (authData) {
             if (authData) {
-                isAuthenticated=true;
+                isAuthenticated = true;
                 $rootScope.authData = authData;
-                console.log("Logged in email ",authData.password.email);
+                console.log("Logged in email ", authData.password.email);
                 console.log("Logged in as:", authData.uid);
             } else {
-                isAuthenticated=false;
+                isAuthenticated = false;
                 console.log("Logged out");
                 $ionicLoading.hide();
                 $location.path('/login');
@@ -82,12 +79,12 @@ myApp.run(function ($ionicPlatform, $rootScope,
         $rootScope.$on("$stateChangeError",
             function (event, toState, toParams, fromState, fromParams, error) {
 
-            // We can catch the error thrown when the $requireAuth promise is rejected
-            // and redirect the user back to the home page
-            if (error === "AUTH_REQUIRED") {
-                $location.path("/login");
-            }
-        });
+                // We can catch the error thrown when the $requireAuth promise is rejected
+                // and redirect the user back to the home page
+                if (error === "AUTH_REQUIRED") {
+                    $location.path("/login");
+                }
+            });
     });
 
 });

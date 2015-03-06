@@ -5,7 +5,7 @@
 
 angular.module('myApp.controllers.login', [ ])
     .controller('loginCtrl', function
-        ($scope, simpleLogin, $location, ionicLoading, $log, $state,$rootScope) {
+        ($scope, simpleLogin, $location, ionicLoading, $log, $state) {
         $scope.logindata = {
             email: '',
             pass: '',
@@ -34,10 +34,10 @@ angular.module('myApp.controllers.login', [ ])
             if (!$scope.logindata.email) {
                 $scope.err = 'Please enter an email address';
             }
-            else if (!$scope.logindata.pass ) {
+            else if (!$scope.logindata.pass) {
                 $scope.err = 'Please enter a password';
             }
-            console.log($scope.logindata.email,$scope.logindata.pass,$scope.logindata.remember,$scope.err);
+            console.log($scope.logindata.email, $scope.logindata.pass, $scope.logindata.remember, $scope.err);
             return !$scope.err;
         }
 
@@ -46,7 +46,7 @@ angular.module('myApp.controllers.login', [ ])
         }
     })
     .controller('LogoutCtrl',
-    function ($scope, simpleLogin, $location, ionicLoading, $log, $ionicActionSheet,$firebaseAuth) {
+    function ($scope, simpleLogin, $location, ionicLoading, $log, $ionicActionSheet) {
         $scope.$watch('action', function (data) {
             if (data !== true) {
                 return

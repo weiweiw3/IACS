@@ -1,4 +1,4 @@
-<div >
+<div>
     <div class="bar bar-header">
         <a class="button icon ion-navicon" href="#/message/{{message.component}}"> </a>
 
@@ -18,12 +18,18 @@
 
             </ion-item>
         </ion-list>
-        <div class="list" >
+        <div class="list">
+            <a ng-repeat="(key,value) in message.last" class="item">
+                {{ key+': '+value }}
+            </a>
+            <span class="item-note" am-time-ago="message.last.date"></span>
+        </div>
+        <div class="list">
             <div class="item item-divider">
                 Header
             </div>
-            <a ng-repeat="data in syncedMetaData" class="item">
-                {{ data.$id+': '+data.$value }}
+            <a ng-repeat="(key,value) in message.metadata" class="item">
+                {{ key+': '+value }}
             </a>
         </div>
         <div class="list" ng-controller="messageItemCtrl">

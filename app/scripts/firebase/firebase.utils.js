@@ -4,94 +4,94 @@
 angular.module('firebase.utils', ['firebase', 'myApp.config'])
     .factory('fbutil', ['$window', 'FIREBASE_URL', '$firebase',
         function ($window, FBURL, $firebase) {
-        "use strict";
+            "use strict";
 
-        return {
-            syncObject: function (path, factoryConfig) {
-                return syncData.apply(null, arguments).$asObject();
-            },
+            return {
+                syncObject: function (path, factoryConfig) {
+                    return syncData.apply(null, arguments).$asObject();
+                },
 
-            syncArray: function (path, factoryConfig) {
-                return syncData.apply(null, arguments).$asArray();
-            },
-            syncData: function (path, factoryConfig) {
-                return syncData.apply(null, arguments);
-            },
-            ref: firebaseRef
-        };
+                syncArray: function (path, factoryConfig) {
+                    return syncData.apply(null, arguments).$asArray();
+                },
+                syncData: function (path, factoryConfig) {
+                    return syncData.apply(null, arguments);
+                },
+                ref: firebaseRef
+            };
 
-        function pathRef(args) {
-            for (var i = 0; i < args.length; i++) {
-                if (angular.isArray(args[i])) {
-                    args[i] = pathRef(args[i]);
+            function pathRef(args) {
+                for (var i = 0; i < args.length; i++) {
+                    if (angular.isArray(args[i])) {
+                        args[i] = pathRef(args[i]);
+                    }
+                    else if (typeof args[i] !== 'string') {
+                        throw new Error('Argument ' + i + ' to firebaseRef is not a string: ' + args[i]);
+                    }
                 }
-                else if (typeof args[i] !== 'string') {
-                    throw new Error('Argument ' + i + ' to firebaseRef is not a string: ' + args[i]);
-                }
+                return args.join('/');
             }
-            return args.join('/');
-        }
 
-        /**
-         * Example:
-         * <code>
-         *    function(firebaseRef) {
+            /**
+             * Example:
+             * <code>
+             *    function(firebaseRef) {
          *       var ref = firebaseRef('path/to/data');
          *    }
-         * </code>
-         *
-         * @function
-         * @name firebaseRef
-         * @param {String|Array...} path relative path to the root folder in Firebase instance
-         * @return a Firebase instance
-         */
-        function firebaseRef(path) {
-            var ref = new $window.Firebase(FBURL);
-            var args = Array.prototype.slice.call(arguments);
-            if (args.length) {
-                ref = ref.child(pathRef(args));
+             * </code>
+             *
+             * @function
+             * @name firebaseRef
+             * @param {String|Array...} path relative path to the root folder in Firebase instance
+             * @return a Firebase instance
+             */
+            function firebaseRef(path) {
+                var ref = new $window.Firebase(FBURL);
+                var args = Array.prototype.slice.call(arguments);
+                if (args.length) {
+                    ref = ref.child(pathRef(args));
+                }
+                return ref;
             }
-            return ref;
-        }
 
-        /**
-         * Create a $firebase reference with just a relative path. For example:
-         *
-         * <code>
-         * function(syncData) {
+            /**
+             * Create a $firebase reference with just a relative path. For example:
+             *
+             * <code>
+             * function(syncData) {
          *    // a regular $firebase ref
          *    $scope.widget = syncData('widgets/alpha');
          *
          *    // or automatic 3-way binding
          *    syncData('widgets/alpha').$bind($scope, 'widget');
          * }
-         * </code>
-         *
-         * Props is the second param passed into $firebase. It can also contain limit, startAt, endAt,
-         * and they will be applied to the ref before passing into $firebase
-         *
-         * @function
-         * @name syncData
-         * @param {String|Array...} path relative path to the root folder in Firebase instance
-         * @param {object} [props]
-         * @return a Firebase instance
-         */
-        function syncData(path, props) {
-            var ref = firebaseRef(path);
-            props = angular.extend({}, props);
+             * </code>
+             *
+             * Props is the second param passed into $firebase. It can also contain limit, startAt, endAt,
+             * and they will be applied to the ref before passing into $firebase
+             *
+             * @function
+             * @name syncData
+             * @param {String|Array...} path relative path to the root folder in Firebase instance
+             * @param {object} [props]
+             * @return a Firebase instance
+             */
+            function syncData(path, props) {
+                var ref = firebaseRef(path);
+                props = angular.extend({}, props);
 
-            angular.forEach(['limit', 'startAt', 'endAt'], function (k) {
-                if (props.hasOwnProperty(k)) {
+                angular.forEach(['limit', 'startAt', 'endAt'], function (k) {
+                    if (props.hasOwnProperty(k)) {
 
-                    var v = props[k];
-                    ref = ref[k].apply(ref, angular.isArray(v) ? v : [v]);
-                    console.log(k, angular.isArray(v) ? v : [v]);
-                    delete props[k];
-                }
-            });
-            return $firebase(ref, props);
-        }
-    }])
+                        var v = props[k];
+                        ref = ref[k].apply(ref, angular.isArray(v) ? v : [v]);
+                        console.log(k, angular.isArray(v) ? v : [v]);
+                        delete props[k];
+                    }
+                });
+                return $firebase(ref, props);
+            }
+        }])
 // a simple utility to create references to Firebase paths
     .factory('firebaseRef', ['Firebase', 'FIREBASE_URL', function (Firebase, FIREBASE_URL) {
         /**
@@ -109,8 +109,8 @@ angular.module('firebase.utils', ['firebase', 'myApp.config'])
         }
     }])
 
-    // a simple utility to create $firebase objects from angularFire
-    .factory('syncData', ['$firebase', 'firebaseRef', function ($firebase, firebaseRef) {
+    // a simple utility to create $firebaseObject objects from angularFire
+    .factory('syncObject', ['$firebaseObject', 'firebaseRef', function ($firebaseObject, firebaseRef) {
         /**
          * @function
          * @name syncData
@@ -121,7 +121,22 @@ angular.module('firebase.utils', ['firebase', 'myApp.config'])
         return function (path, limit) {
             var ref = firebaseRef(path);
             limit && (ref = ref.limit(limit));
-            return $firebase(ref);
+            return $firebaseObject(ref);
+        }
+    }])
+    // a simple utility to create $firebaseArray objects from angularFire
+    .factory('syncArray', ['$firebaseArray', 'firebaseRef', function ($firebaseArray, firebaseRef) {
+        /**
+         * @function
+         * @name syncData
+         * @param {String|Array...} path
+         * @param {int} [limit]
+         * @return a Firebase instance
+         */
+        return function (path, limit) {
+            var ref = firebaseRef(path);
+            limit && (ref = ref.limit(limit));
+            return $firebaseArray(ref);
         }
     }])
     .factory('syncDataSE', ['$firebase', 'firebaseRef', function ($firebase, firebaseRef) {

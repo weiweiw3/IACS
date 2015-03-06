@@ -6,77 +6,80 @@ angular.module('myApp.services.myMessage', ['firebase', 'firebase.utils', 'fireb
     //functions:
     // 1, get message list with componentID
     // 2, get and update favorite
-.factory('myMessage', ['$rootScope', 'syncData', 'simpleLogin',
-    function ($rootScope, syncData, simpleLogin) {
-        var currentUser = simpleLogin.user.uid;
-        var statusObj;
-        var MessageRefStr = 'users/' + currentUser + '/messages';
+    .factory('myMessage', ['$rootScope', 'syncArray', 'syncObject', 'simpleLogin',
+        function ($rootScope, syncArray, syncObject, simpleLogin) {
+            var currentUser = simpleLogin.user.uid;
+            var statusObj;
+            var MessageRefStr = 'users/' + currentUser + '/messages';
 
-        var myMessages = {
+            var myMessages = {
 
-            getMessageMetadata: function (componentId,messageId) {
-                return  syncData([MessageRefStr, componentId,messageId,'data/metadata']).$asArray();
-            },
-            getMessageHeader: function (componentId,messageId) {
-                return  syncData([MessageRefStr, componentId,messageId,'data']).$asObject();
-            },
-            getMessageHeaderArray: function (componentId,messageId) {
-                return  syncData([MessageRefStr, componentId,messageId,'data']).$asArray();
-            },
-            //startAtItems:1,limit: 5
-            getMessageItems: function (componentId,messageId) {
-                return  syncData([MessageRefStr, componentId,messageId,'items']).$asArray();
-            },
+                getMessageMetadata: function (componentId, messageId) {
+                    return  syncArray([MessageRefStr, componentId, messageId, 'data/metadata']);
+                },
+                getMessageHeader: function (componentId, messageId) {
+                    return  syncObject([MessageRefStr, componentId, messageId, 'data']);
+                },
+                getE0002Header: function (messageId) {
+                    return  syncObject([MessageRefStr, 'E0002', messageId]);
+                },
+                getMessageHeaderArray: function (componentId, messageId) {
+                    return  syncArray([MessageRefStr, 'E0001', messageId, 'data']);
+                },
+                //startAtItems:1,limit: 5
+                getMessageItems: function (componentId, messageId) {
+                    return  syncArray([MessageRefStr, 'E0001', messageId, 'items']);
+                },
 
-            //startAtItems:6
-            getMessageMoreItems: function (componentId,messageId) {
-                return  syncData([MessageRefStr, componentId,messageId,'moreItems']).$asArray();
-            },
-            markStatus: function(componentId, messageId,status,statusValue){
-                //statusValue is optionalArg
-                statusValue = (typeof statusValue === "undefined")
-                    ? "defaultValue" : statusValue;
+                //startAtItems:6
+                getMessageMoreItems: function (componentId, messageId) {
+                    return  syncArray([MessageRefStr, 'E0001', messageId, 'moreItems']);
+                },
+                markStatus: function (componentId, messageId, status, statusValue) {
+                    //statusValue is optionalArg
+                    statusValue = (typeof statusValue === "undefined")
+                        ? "defaultValue" : statusValue;
+                    if (componentId === 'E0001') {
+                        statusStr = 'data/' + status;
+                    }
+                    var obj = syncObject([MessageRefStr, componentId, messageId, statusStr]);
 
-                var obj = syncData([MessageRefStr, componentId, messageId, 'data',status])
-                    .$asObject();
-
-                if (statusValue === "defaultValue") {
-                    // load statusValue from firebase
-                    obj.$loaded().then(function (data) {
-                        statusObj = {
-                            componentId:componentId,
-                            messageId: messageId,
-                            status:status,
-                            statusValue: data.$value
-                        };
-                        $rootScope.$broadcast(status+'.update');
-                    });
-                } else {
-                    //update statusValue in firebase
-                    obj.$value = statusValue;
-                    obj.$save().then(function () {
-                        statusObj = {
-                            componentId:componentId,
-                            messageId: messageId,
-                            status:status,
-                            statusValue: statusValue
-                        };
-                        $rootScope.$broadcast(status+'.update');
-                    });
+                    if (statusValue === "defaultValue") {
+                        // load statusValue from firebase
+                        obj.$loaded().then(function (data) {
+                            statusObj = {
+                                componentId: componentId,
+                                messageId: messageId,
+                                status: status,
+                                statusValue: data.$value
+                            };
+                            $rootScope.$broadcast(status + '.update');
+                        });
+                    } else {
+                        //update statusValue in firebase
+                        obj.$value = statusValue;
+                        obj.$save().then(function () {
+                            statusObj = {
+                                componentId: componentId,
+                                messageId: messageId,
+                                status: status,
+                                statusValue: statusValue
+                            };
+                            $rootScope.$broadcast(status + '.update');
+                        });
+                    }
+                },
+                getStatus: function (componentId, messageId, status) {
+                    if (componentId === statusObj.componentId
+                        && messageId === statusObj.messageId
+                        && status === statusObj.status) {
+                        return statusObj.statusValue;
+                    } else {
+                        return 'error'
+                    }
                 }
-            },
-            getStatus: function (componentId,messageId,status) {
-                if ( componentId=== statusObj.componentId
-                    && messageId === statusObj.messageId
-                    && status === statusObj.status)
-                {
-                    return statusObj.statusValue;
-                } else {
-                    return 'error'
-                }
-            }
 
-        };
-        return myMessages;
-    }]);
+            };
+            return myMessages;
+        }]);
 

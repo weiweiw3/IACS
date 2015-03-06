@@ -17,7 +17,7 @@ angular.module('myApp.controllers.messagesInOneComponent', [])
             $scope.messages = myComponent.messagesArray($scope.component);
         });
 
-        $scope.$watch('messages',function (newVal) {
+        $scope.$watch('messages', function (newVal) {
             if (angular.isUndefined(newVal) || newVal == null) {
                 return
             }
@@ -26,26 +26,39 @@ angular.module('myApp.controllers.messagesInOneComponent', [])
         });
 
 
-        $scope.goDetail = function (key,read) {
-            messageId=key;
-            if(!read)
-            {
-                myMessage.markStatus(componentId,messageId,'read',true)
-            }else{
-                navigate(componentId,messageId);
+        $scope.goDetail = function (key, read) {
+            messageId = key;
+            if (!read) {
+                myMessage.markStatus(componentId, messageId, 'read', true)
             }
+            navigate(componentId, messageId);
+
 
         };
-        function navigate(componentId,messageId){
-            $location.path('/message').search({
-                'key': messageId,
-                'component': componentId
-            });
+        function navigate(componentId, messageId) {
+            console.log(componentId);
+            if (componentId === 'E0001') {
+
+                $location.path('/message').search({
+                    'key': messageId,
+                    'component': componentId
+                });
+            }
+            if (componentId === 'E0002') {
+
+                $location.path('/message').search({
+                    'key': messageId,
+                    'component': 'E0001',
+                    'return': componentId
+                });
+
+            }
         }
+
         $scope.$on('read.update', function (event) {
-            var read = myMessage.getStatus(componentId,messageId,'read');
+            var read = myMessage.getStatus(componentId, messageId, 'read');
             myComponent.UnreadCountMinus(componentId);
-            navigate(componentId,messageId);
+            navigate(componentId, messageId);
 
         });
 //        $scope.predicate = 'favorite';

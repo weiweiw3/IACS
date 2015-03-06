@@ -14,8 +14,11 @@
                 <h1 ng-class="{positive: message.read, energized: message.favorite}">
                     {{ message.id }}
                 </h1>
+
                 <div class="row">
                     <div class="col">{{ message.metadata.target_VAL| currency:"RMB￥"}}</div>
+                    <div class="col">{{ message.message}}</div>
+
                     <span class="item-note" am-time-ago="message.date"></span>
                 </div>
             </ion-item>

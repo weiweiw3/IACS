@@ -3,8 +3,8 @@
  */
 angular.module('myApp.services.myTask',
     ['firebase', 'firebase.utils', 'firebase.simpleLogin'])
-.factory('myTask',
-    function ($rootScope, $q, syncData, $timeout, simpleLogin,myMessage,myUser) {
+    .factory('myTask',
+    function ($rootScope, $q, syncArray, syncObject, $timeout, simpleLogin, myMessage, myUser) {
         var currentUser = simpleLogin.user.uid;
         var date = Date.now();
         var messageLog = {
@@ -12,19 +12,19 @@ angular.module('myApp.services.myTask',
             user: currentUser,
             date: date
         };
-        var taskDefaultRefStr='CompanySetting/EventDefaltValues';
+        var taskDefaultRefStr = 'CompanySetting/EventDefaltValues';
         var createTask;
         createTask = {
             getInputP: function (event) {
-                return syncData([taskDefaultRefStr, event, 'inputParas'])
-                    .$asObject();
+                return syncObject([taskDefaultRefStr, event, 'inputParas'])
+                    ;
             },
 
             createTask: function (opt, messageId, nextAction, inputPStr, event) {
-                var self=this;
-                var componentId='E0001';
-                var logRef = syncData(['users', currentUser, 'log', event, messageId]);
-                var taskRef = syncData(['tasks']);
+                var self = this;
+                var componentId = 'E0001';
+                var logRef = syncObject(['users', currentUser, 'log', event, messageId]).$ref();
+                var taskRef = syncObject(['tasks']).$ref();
 
                 messageLog.action = nextAction;
                 var cb = opt.callback || function () {
@@ -36,9 +36,9 @@ angular.module('myApp.services.myTask',
                 };
 
                 //promise process
-                var promise=addNewTask(taskRef, inputPStr,event,currentUser);
+                var promise = addNewTask(taskRef, inputPStr, event, currentUser);
                 promise
-                    .then(log4task(logRef,event))
+                    .then(log4task(logRef, event))
 //                    .then(myMessage.getLock(componentId,messageId,true))
                     // success
                     .then(function () {
@@ -50,26 +50,34 @@ angular.module('myApp.services.myTask',
                 function addNewTask(taskRef, inputP, event) {
 
                     var d = $q.defer();
-                    var taskDataObj=syncData([taskDefaultRefStr, event]);
-                    var taskDataRef=taskDataObj.$ref();
-                    var ServerUser=myUser.getServerUser();
+                    var taskDataObj = syncObject([taskDefaultRefStr, event]);
+                    var taskDataRef = taskDataObj.$ref();
+                    var ServerUser = myUser.getServerUser();
                     var taskData;
 
-                    taskDataRef.on("value", function(snap) {
-                        taskData=snap.val();
-                        taskData.inputParas = '';
-                        ServerUser.$loaded().then(function(data){
-                            taskData.userId=data.$value;
-                            taskRef.$push(taskData).then(
-                                function (ref) {
-                                    inputP=inputP+'; task_FB='+ref.key();
-                                    ref.child('inputParas').set(inputP);
-                                    console.log('new Task'+ref.key());
-                                    d.resolve();
-                                }, function (error) {
+                    taskDataRef.on("value", function (snap) {
+                        taskData = snap.val();
+
+                        ServerUser.$loaded().then(function (data) {
+                            taskData.userId = data.$value;
+                            taskData.inputParas = '';
+                            var newTaskRef = taskRef.push(taskData, function (error) {
+                                if (error) {
                                     d.reject(error);
                                     console.log("Error:", error);
-                                });
+                                }
+                            });
+                            inputP = inputP + '; task_FB=' + newTaskRef.key();
+                            newTaskRef.child('inputParas').set(inputP, function (error) {
+                                if (error) {
+                                    d.reject(error);
+                                    console.log("Error:", error);
+                                } else {
+                                    console.log('new Task' + newTaskRef.key());
+                                    d.resolve();
+                                }
+                            });
+
                         });
                     });
 
@@ -81,13 +89,15 @@ angular.module('myApp.services.myTask',
                     var ref = logRef;
                     var d = $q.defer();
                     messageLog.action = event;
-                    ref.$push(messageLog).then(
-                        function (ref) {
-//                            console.log(ref.key());   // Key for the new ly created record
+                    ref.push(messageLog, function (error) {
+                        if (error) {
+                            d.reject(error);
+
+                        } else {
+
                             d.resolve();
-                        }, function (error) {
-                            console.log("Error:", error);
-                        });
+                        }
+                    });
                     return d.promise;
                 }
 

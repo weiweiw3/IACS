@@ -2,13 +2,13 @@
 
 angular.module('myApp.controllers.setting', [ ])
 
-    .controller('setting.profileCtrl', function ($scope, syncData, $rootScope) {
+    .controller('setting.profileCtrl', function ($scope, syncObject, $rootScope) {
         $scope.items = ['settings', 'home', 'other'];
         /*triple data binding*/
         $scope.syncProfile = function () {
 
 //          $scope.profile = {};
-            syncData(['users', $rootScope.auth.user, 'profile']).$asObject()
+            syncObject(['users', $rootScope.auth.user, 'profile'])
                 .$bindTo($scope, 'profile')
                 .then(function (unBind) {
                     $scope.unBindProfile = unBind;
