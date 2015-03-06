@@ -4,9 +4,8 @@
 angular.module('myApp.controllers.messagesDetail', [])
     //for message.html
     .controller('messageHeaderCtrl',
-    function (myMessage,$location, $log, $timeout, $scope, ionicLoading, simpleLogin) {
+    function (myMessage,$location, $log, $timeout, $scope, ionicLoading) {
 
-        var currentUser = simpleLogin.user.uid;
         var params = $location.search();
         var messageId =$scope.messageId = params.key;
         var component =$scope.component = params.component;

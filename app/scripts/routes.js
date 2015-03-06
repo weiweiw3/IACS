@@ -12,14 +12,32 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                 .state('login', {            // setup an login page
                     url: "/login",
                     templateUrl: "templates/login.html",
-                    controller: 'loginCtrl'
+                    controller: 'loginCtrl',
+                    resolve: {
+                        // controller will not be loaded until $waitForAuth resolves
+                        // Auth refers to our $firebaseAuth wrapper in the example above
+                        "currentAuth": ["simpleLogin",
+                            function (simpleLogin) {
+                                // $waitForAuth returns a promise so the resolve waits for it to complete
+                                return simpleLogin.auth.$waitForAuth();
+                            }]
+                    }
                 })
 
                 .state('tab', {            // setup an abstract state for the tabs directive
                     url: "/tab",
-//                    authRequired: true,
                     abstract: true,
-                    templateUrl: "templates/tabs.html"
+                    templateUrl: "templates/tabs.html",
+                    resolve: {
+                        // controller will not be loaded until $requireAuth resolves
+                        // Auth refers to our $firebaseAuth wrapper in the example above
+                        "currentAuth": ["simpleLogin",
+                            function (simpleLogin) {
+                                // $requireAuth returns a promise so the resolve waits for it to complete
+                                // If the promise is rejected, it will throw a $stateChangeError (see above)
+                                return simpleLogin.auth.$requireAuth();
+                            }]
+                    }
                 })
 
                 .state('tab.messages', {            // the message tab has its own child nav-view and history
@@ -30,17 +48,17 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                             templateUrl: 'templates/messages-index.html',
                             controller: 'messagesIndexCtrl'
                         }
+                    },
+                    resolve: {
+                        // controller will not be loaded until $requireAuth resolves
+                        // Auth refers to our $firebaseAuth wrapper in the example above
+                        "currentAuth": ["simpleLogin",
+                            function (simpleLogin) {
+                                // $requireAuth returns a promise so the resolve waits for it to complete
+                                // If the promise is rejected, it will throw a $stateChangeError (see above)
+                                return simpleLogin.auth.$requireAuth();
+                            }]
                     }
-//                    ,
-//                    resolve: {
-//                        // forces the page to wait for this promise to resolve before controller is loaded
-//                        // the controller can then inject `user` as a dependency. This could also be done
-//                        // in the controller, but this makes things cleaner (controller doesn't need to worry
-//                        // about auth status or timing of displaying its UI components)
-//                        user: ['simpleLogin', function (simpleLogin) {
-//                            return simpleLogin.getUser();
-//                        }]
-//                    }
                 })
 
                 .state('message-list', {
@@ -90,12 +108,9 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                 // the setting tab has its own child nav-view and history
                 .state('tab.setting', {
                     url: '/setting',
-//                    authRequired: true,
                     views: {
                         'setting-tab': {
                             templateUrl: 'templates/setting.html'
-//                            ,
-//                            controller: 'loginCtrl'
                         }
                     }
                 })
@@ -125,7 +140,7 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                 function () {
                     if (isAuthenticated) {
                         console.log('isAuthenticated',isAuthenticated);
-                        return '/tab/messages'
+                        return '/tab/setting'
                     } else {
                         console.log('isAuthenticated',isAuthenticated);
                         return '/login'
@@ -133,9 +148,6 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                 }
             );
         }
-
-
-
     ]);
 ///**
 // * Apply some route security. Any route's resolve method can reject the promise with

@@ -4,7 +4,7 @@
 angular.module('myApp.services.myTask',
     ['firebase', 'firebase.utils', 'firebase.simpleLogin'])
 .factory('myTask',
-    function ($rootScope, $q, syncData, $timeout, simpleLogin,myMessage) {
+    function ($rootScope, $q, syncData, $timeout, simpleLogin,myMessage,myUser) {
         var currentUser = simpleLogin.user.uid;
         var date = Date.now();
         var messageLog = {
@@ -46,25 +46,34 @@ angular.module('myApp.services.myTask',
                     }, cb)
                     .catch(errorFn);
 
+
                 function addNewTask(taskRef, inputP, event) {
 
                     var d = $q.defer();
                     var taskDataObj=syncData([taskDefaultRefStr, event]);
                     var taskDataRef=taskDataObj.$ref();
+                    var ServerUser=myUser.getServerUser();
+                    var taskData;
 
                     taskDataRef.on("value", function(snap) {
-                        var data=snap.val();
-                        data.inputParas = '';
-                        taskRef.$push(data).then(
-                            function (ref) {
-                                inputP=inputP+'; task_FB='+ref.key();
-                                ref.child('inputParas').set(inputP);
-                                d.resolve();
-                            }, function (error) {
-                                d.reject(error);
-                                console.log("Error:", error);
-                            });
+                        taskData=snap.val();
+                        taskData.inputParas = '';
+                        ServerUser.$loaded().then(function(data){
+                            taskData.userId=data.$value;
+                            taskRef.$push(taskData).then(
+                                function (ref) {
+                                    inputP=inputP+'; task_FB='+ref.key();
+                                    ref.child('inputParas').set(inputP);
+                                    console.log('new Task'+ref.key());
+                                    d.resolve();
+                                }, function (error) {
+                                    d.reject(error);
+                                    console.log("Error:", error);
+                                });
+                        });
                     });
+
+
                     return d.promise;
                 }
 
@@ -74,7 +83,7 @@ angular.module('myApp.services.myTask',
                     messageLog.action = event;
                     ref.$push(messageLog).then(
                         function (ref) {
-                            console.log(ref.key());   // Key for the new ly created record
+//                            console.log(ref.key());   // Key for the new ly created record
                             d.resolve();
                         }, function (error) {
                             console.log("Error:", error);

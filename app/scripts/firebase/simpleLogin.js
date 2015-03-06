@@ -107,7 +107,7 @@ angular.module('firebase.simpleLogin', ['firebase', 'firebase.utils', 'changeEma
             }
 
             var fns = {
-//                auth: auth,
+                auth: auth,
 
                 user: null,
 
@@ -139,7 +139,7 @@ angular.module('firebase.simpleLogin', ['firebase', 'firebase.utils', 'changeEma
                 logout: function () {
 //                    $rootScope.$broadcast('authManager:beforeLogout', auth);
 //                    auth.$logout();
-
+                    console.log('logout');
                     auth.$unauth();
                 },
 

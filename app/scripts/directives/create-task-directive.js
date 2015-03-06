@@ -6,12 +6,6 @@ angular.module('myApp.directives.createTask', [])
 .directive('createTask', function (myMessage,$rootScope,
                                    myTask, $q, $animate, ionicLoading) {
 
-//  TODO: create E0002 inputP
-//  inputP: CompanySetting/EventDefaltValues/E0002
-//        "PO_REL_CODE=$P01$;
-//        PURCHASEORDER=$P02$;
-//        FB_PATH=Event/E0002/$P03$/$P02$;
-//        SAP_SYSTEM=sap_system_guid_default"
     return {
         restrict: "E",
         scope: {
@@ -26,12 +20,20 @@ angular.module('myApp.directives.createTask', [])
         replace: true,
         link: function ($scope, element) {
             var event='E0002';
-            var inputPStr;
+            var inputParas= '';
+            var P01,P02,P03;
+
             ionicLoading.load();
             $scope.inputPObj=myTask.getInputP(event);
             $scope.inputPObj.$loaded().then(
                 function (data){
-                    inputPStr=data.$value;
+                    inputParas=data.$value;
+                    inputParas = inputParas.replace('$P01$', P01);//PO_REL_CODE
+                    //TODO replace P02 twice , in the furture use replace-all function
+                    inputParas = inputParas.replace('$P02$',P02);//PURCHASEORDER
+                    inputParas = inputParas.replace('$P02$',P02);//PURCHASEORDER
+                    inputParas = inputParas.replace('$P03$', P03);//ServerUserID
+
                 }
             );
             $scope.$watch('message', function (newVal) {
@@ -40,7 +42,16 @@ angular.module('myApp.directives.createTask', [])
                 }
                 $scope.messageId=newVal.id;
                 $scope.componentId=newVal.component;
+                // P01,P02,P03 for replace inputP
+
+                //TODO support one purchase order : Multiple release group
+                P01=newVal.release_group.substr(3);
+                P02=newVal.id;
+                P03=newVal.serverUserid;
+
                 myMessage.markStatus($scope.componentId,$scope.messageId,'lock');
+
+
             });
             $scope.$on('lock.update', function (event) {
                 $scope.lock = myMessage.getStatus($scope.componentId,$scope.messageId,'lock');
@@ -63,8 +74,9 @@ angular.module('myApp.directives.createTask', [])
             $scope.click = function () {
                 $scope.btnText = 'processing...';
                 ionicLoading.load();
+
                 myTask.createTask(buildParms(),
-                    $scope.message.id, $scope.clickEvent,inputPStr,event);
+                    $scope.message.id, $scope.clickEvent,inputParas,event);
             };
 
 

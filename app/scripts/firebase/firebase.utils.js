@@ -2,7 +2,8 @@
 
 // a simple wrapper on Firebase and AngularFire to simplify deps and keep things DRY
 angular.module('firebase.utils', ['firebase', 'myApp.config'])
-    .factory('fbutil', ['$window', 'FIREBASE_URL', '$firebase', function ($window, FBURL, $firebase) {
+    .factory('fbutil', ['$window', 'FIREBASE_URL', '$firebase',
+        function ($window, FBURL, $firebase) {
         "use strict";
 
         return {
