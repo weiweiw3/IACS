@@ -5,37 +5,30 @@
 
 angular.module('myApp.controllers.SAPUserValidation', [ ])
     .controller('SAPUserValidationCtrl',
-    function (myTask,$scope, syncData, ionicLoading, myUser) {
+    function (myTask, $scope, ionicLoading, myUser) {
         //TODO 如果密码已经存在，可以进行修改操作；如果不存在，进行密码验证。
         //create A0001 task with A0001 input parameters
         var inputParas = '';
-        var taskData = {
-            //TODO find root companyId
-            "companyId": "40288b8147cd16ce0147cd236df20000",
-            "eventType": "A0001",
-            "taskPriority": "0",
-            "taskStatus": "0",
-            "triggerTime": "immediate",
-            "userId": "100018"
-            //TODO find serverUserID with FBUser
-        };
-        var event='A0001';
+
+        var componentId = 'A0001';
         $scope.languages = [
             { name: "Chinese", value: '1'},
             { name: "English", value: 'E'},
             { name: "German", value: 'D'}
         ];
-
+        $scope.preflang = { name: "English", value: 'E'};
         $scope.model = {};
         ionicLoading.load();
+        $scope.serverUser = myUser.getServerUser();
 
-        $scope.model =myUser.getSAPUser(); //        {user/password/valid/language}
-        $scope.model.$loaded().then(function (snapdata) {
-            if (typeof snapdata.languages != 'undefined') {
-                $scope.model.preflang = $scope.languages[snapdata.languages];
-            } else {
-                $scope.model.preflang = $scope.languages[1];
-            }
+        //   {user/password/valid/language}
+        myUser.getSAPUser().$bindTo($scope, "model").then(function (snapdata) {
+//            if (typeof snapdata.languages != 'undefined') {
+//                $scope.preflang = $scope.languages[snapdata.languages];
+//
+//            } else {
+//                $scope.preflang = $scope.languages[1];
+//            }
             if (!snapdata.valid ) {
                 $scope.model.buttontext='validate';
             } else {
@@ -44,10 +37,13 @@ angular.module('myApp.controllers.SAPUserValidation', [ ])
         });
 
         $scope.SAPSysArray = myUser.getSAPSys();
-        $scope.inputPObj=myTask.getInputP(event);
+        $scope.inputPObj = myTask.getInputP(componentId);
 
         $scope.inputPObj.$loaded().then(function (data) {
             inputParas = data.$value;
+            $scope.serverUser.$loaded().then(function (data) {
+                inputParas = inputParas.replace('$P00$', data.$value);
+            });
             $scope.SAPSysArray.$loaded()
                 .then(function () {
                     $scope.SAPSysArray.forEach(function (entry) {
@@ -70,25 +66,27 @@ angular.module('myApp.controllers.SAPUserValidation', [ ])
         $scope.tryValidation = function () {
             inputParas = inputParas.replace('$P06$', $scope.model.user);
             inputParas = inputParas.replace('$P07$', $scope.model.password);
-            inputParas = inputParas.replace('$P08$', $scope.model.preflang.value);
-            var data = {
-                "companyId": "40288b8147cd16ce0147cd236df20000",
-                "eventType": "A0001",
-                "taskPriority": "0",
-                "taskStatus": "0",
-                "triggerTime": "immediate",
-                "userId": "100018"
-            };
+            inputParas = inputParas.replace('$P08$', $scope.preflang.value);
 
-            var ref1 = syncData(['tasks']);
-            ref1.$push(data).then(function (ref) {
-                ref.key();   // key for the new ly created record
-                inputParas = inputParas.replace('$P00$', ref.key());
-                ref.child('inputParas').set(inputParas);
-            }, function (error) {
-                console.log("Error:", error);
-            });
-            console.log(inputParas, $scope.model.preflang);
+            myTask.createTask(componentId, inputParas,
+                'SAPValidation', $scope.clickEvent, buildParms());
+
+//TODO 页面select生成值无法打印在console.log
+            console.log(inputParas, $scope.preflang, $scope.selectedItem);
         };
+        function buildParms() {
+            return {
 
+                callback: function (err) {
+                    if (err == null) {
+                    }
+                    if (err) {
+                        $scope.err = err;
+                    }
+                    else {
+                        $scope.msg = 'finished';
+                    }
+                }
+            };
+        }
     });

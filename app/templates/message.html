@@ -13,9 +13,10 @@
     <ion-content>
         <ion-list>
             <ion-item type="item-text-wrap">
-                <create-task message="message">
-                </create-task>
-
+                <div ng-repeat="data in releaseGroupArray">
+                    <create-task message="message" release-group="data">
+                    </create-task>
+                </div>
             </ion-item>
         </ion-list>
         <div class="list">

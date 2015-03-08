@@ -8,7 +8,9 @@ angular.module('myApp.directives.createTask', [])
         return {
             restrict: "E",
             scope: {
+                releaseGroup: "=",
                 message: "="// Use @ for One Way Text Binding;Use = for Two Way Binding;Use & to Execute Functions in the Parent Scope
+
             },
             controller: function ($scope) {
                 $scope.btnText = '';
@@ -18,12 +20,12 @@ angular.module('myApp.directives.createTask', [])
                 'ng-disabled="isDisabled" ng-click="click()">{{ btnText }}</a>',
             replace: true,
             link: function ($scope, element) {
-                var event = 'E0002';
+                var componentId = 'E0002';
                 var inputParas = '';
                 var P01, P02, P03;
 
                 ionicLoading.load();
-                $scope.inputPObj = myTask.getInputP(event);
+                $scope.inputPObj = myTask.getInputP(componentId);
                 $scope.inputPObj.$loaded().then(
                     function (data) {
                         inputParas = data.$value;
@@ -44,7 +46,7 @@ angular.module('myApp.directives.createTask', [])
                     // P01,P02,P03 for replace inputP
 
                     //TODO support one purchase order : Multiple release group
-                    P01 = newVal.release_group.substr(3);
+                    P01 = $scope.releaseGroup.substr(3);
                     P02 = newVal.id;
                     P03 = newVal.serverUserid;
 
@@ -64,7 +66,7 @@ angular.module('myApp.directives.createTask', [])
                         $scope.btnText = 'SEND OUT';
                     } else {
 
-                        $scope.btnText = 'Approve';
+                        $scope.btnText = 'Approve as ' + $scope.releaseGroup;
                         $scope.isDisabled = false;
                         $scope.clickEvent = 'Approve';
                     }
@@ -75,8 +77,8 @@ angular.module('myApp.directives.createTask', [])
                     $scope.btnText = 'processing...';
                     ionicLoading.load();
 
-                    myTask.createTask(buildParms(),
-                        $scope.message.id, $scope.clickEvent, inputParas, event);
+                    myTask.createTask(componentId,
+                        inputParas, $scope.message.id, $scope.clickEvent, buildParms());
                 };
 
 

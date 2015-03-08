@@ -8,14 +8,12 @@
 
         <ion-list>
             <ion-item type="item-text-wrap" ng-controller="setting.profileCtrl">
-                {{ auth.user.id }}{{ profile.b }}
+                {{ authData.password.email}}{{ profile.b }}
                 <a class="button icon ion-home" href="#/tab/myprofile"> </a>
             </ion-item>
-            <ion-item type="item-text-wrap" href="#/components-management"> >
-                components-management
-            </ion-item>
+
             <ion-item type="item-text-wrap" href="#/tab/sap-user-validation"> >
-                sap user validation
+                SAP User validation
             </ion-item>
 
             <ion-item type="item-text-wrap" ng-controller="LogoutCtrl">

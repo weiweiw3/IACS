@@ -36,14 +36,11 @@ angular.module('myApp.controllers.messagesDetail', [])
         $scope.syncedHeaderData.$loaded()
             .then(function (data) {
                 $scope.message = data;//all the data in the scope are from here.
+                $scope.releaseGroupArray = $scope.message.release_group.split("||");
 
-//                    angular.forEach($scope.message, function (value, key) {
-//                        if (!key.indexOf('$')) {
-//                            delete $scope.message[key];
-//                        }
-//                    });
             })
             .then(ionicLoading.unload());
+
 
         $scope.$on('$viewContentLoaded', function () {
             ionicLoading.load('Content Loading...');

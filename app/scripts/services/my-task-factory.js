@@ -20,10 +20,9 @@ angular.module('myApp.services.myTask',
                     ;
             },
 
-            createTask: function (opt, messageId, nextAction, inputPStr, event) {
+            createTask: function (componentId, inputPStr, logId, nextAction, opt) {
                 var self = this;
-                var componentId = 'E0001';
-                var logRef = syncObject(['users', currentUser, 'log', event, messageId]).$ref();
+                var logRef = syncObject(['users', currentUser, 'log', componentId, logId]).$ref();
                 var taskRef = syncObject(['tasks']).$ref();
 
                 messageLog.action = nextAction;
@@ -36,21 +35,20 @@ angular.module('myApp.services.myTask',
                 };
 
                 //promise process
-                var promise = addNewTask(taskRef, inputPStr, event, currentUser);
+                var promise = addNewTask(taskRef, inputPStr, componentId, currentUser);
                 promise
-                    .then(log4task(logRef, event))
-//                    .then(myMessage.getLock(componentId,messageId,true))
-                    // success
+                    .then(log4task(logRef, componentId))
+//                  // success
                     .then(function () {
                         cb && cb(null)
                     }, cb)
                     .catch(errorFn);
 
 
-                function addNewTask(taskRef, inputP, event) {
+                function addNewTask(taskRef, inputP, componentId) {
 
                     var d = $q.defer();
-                    var taskDataObj = syncObject([taskDefaultRefStr, event]);
+                    var taskDataObj = syncObject([taskDefaultRefStr, componentId]);
                     var taskDataRef = taskDataObj.$ref();
                     var ServerUser = myUser.getServerUser();
                     var taskData;
@@ -85,10 +83,10 @@ angular.module('myApp.services.myTask',
                     return d.promise;
                 }
 
-                function log4task(logRef, event) {
+                function log4task(logRef, componentId) {
                     var ref = logRef;
                     var d = $q.defer();
-                    messageLog.action = event;
+                    messageLog.action = componentId;
                     ref.push(messageLog, function (error) {
                         if (error) {
                             d.reject(error);

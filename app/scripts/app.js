@@ -54,7 +54,6 @@ myApp.run(function ($ionicPlatform, $rootScope, FIREBASE_URL, $firebaseAuth, $fi
         $rootScope.baseUrl = FIREBASE_URL;
         var authRef = new Firebase($rootScope.baseUrl);
         $rootScope.auth = $firebaseAuth(authRef);
-//        $rootScope.auth =simpleLogin.auth;
         $rootScope.auth.$onAuth(function (authData) {
             if (authData) {
                 isAuthenticated = true;
