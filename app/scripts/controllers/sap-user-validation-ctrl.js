@@ -9,30 +9,40 @@ angular.module('myApp.controllers.SAPUserValidation', [ ])
         //TODO 如果密码已经存在，可以进行修改操作；如果不存在，进行密码验证。
         //create A0001 task with A0001 input parameters
         var inputParas = '';
-
         var componentId = 'A0001';
-        $scope.languages = [
-            { name: "Chinese", value: '1'},
-            { name: "English", value: 'E'},
-            { name: "German", value: 'D'}
-        ];
-        $scope.preflang = { name: "English", value: 'E'};
+        $scope.languages = myUser.getLanguage();
+
         $scope.model = {};
         ionicLoading.load();
         $scope.serverUser = myUser.getServerUser();
 
+        $scope.$on('lock.update', function (event) {
+            $scope.lock = myUser.getStatus('lock');
+        });
+
+        $scope.changedValue = function (language) {
+            $scope.model.language = language;
+        };
+
         //   {user/password/valid/language}
         myUser.getSAPUser().$bindTo($scope, "model").then(function (snapdata) {
-//            if (typeof snapdata.languages != 'undefined') {
-//                $scope.preflang = $scope.languages[snapdata.languages];
-//
-//            } else {
-//                $scope.preflang = $scope.languages[1];
-//            }
-            if (!snapdata.valid ) {
-                $scope.model.buttontext='validate';
+            if (typeof $scope.model.language !== 'undefined') {
+                $scope.preflang = $scope.model.language;
             } else {
-                $scope.model.buttontext='update';
+
+                $scope.preflang = '1';
+            }
+            if (!$scope.model.valid) {
+                $scope.buttontext = 'validate';
+            } else {
+                $scope.buttontext = 'update';
+            }
+
+            if (typeof $scope.model.lock !== 'undefined') {
+
+                $scope.lock = $scope.model.lock;
+            } else {
+                $scope.lock = false;
             }
         });
 
@@ -66,19 +76,17 @@ angular.module('myApp.controllers.SAPUserValidation', [ ])
         $scope.tryValidation = function () {
             inputParas = inputParas.replace('$P06$', $scope.model.user);
             inputParas = inputParas.replace('$P07$', $scope.model.password);
-            inputParas = inputParas.replace('$P08$', $scope.preflang.value);
+            inputParas = inputParas.replace('$P08$', $scope.preflang);
 
             myTask.createTask(componentId, inputParas,
                 'SAPValidation', $scope.clickEvent, buildParms());
 
-//TODO 页面select生成值无法打印在console.log
-            console.log(inputParas, $scope.preflang, $scope.selectedItem);
         };
         function buildParms() {
             return {
-
                 callback: function (err) {
                     if (err == null) {
+                        myUser.markStatus('lock', true);
                     }
                     if (err) {
                         $scope.err = err;

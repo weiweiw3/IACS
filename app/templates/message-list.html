@@ -9,7 +9,7 @@
         <ion-list>
             <ion-item type="item-text-wrap"
                       ng-repeat="message in messages  | orderBy:['-favorite','-id']"
-                      ng-click="goDetail(message.id,message.read)">
+                      ng-click="goDetail(message.id,message.read,message.origin)">
 
                 <h1 ng-class="{positive: message.read, energized: message.favorite}">
                     {{ message.id }}

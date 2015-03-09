@@ -80,7 +80,6 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                 // the contacts tab has its own child nav-view and history
                 .state('tab.contacts', {
                     url: '/contacts',
-//                    authRequired: false,
                     views: {
                         'contacts-tab': {
                             templateUrl: 'templates/contacts.html'
@@ -139,10 +138,10 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
             $urlRouterProvider.otherwise(
                 function () {
                     if (isAuthenticated) {
-                        console.log('isAuthenticated',isAuthenticated);
+                        console.log('isAuthenticated', isAuthenticated);
                         return '/tab/setting'
                     } else {
-                        console.log('isAuthenticated',isAuthenticated);
+                        console.log('isAuthenticated', isAuthenticated);
                         return '/login'
                     }
                 }

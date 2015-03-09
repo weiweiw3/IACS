@@ -37,11 +37,15 @@ angular.module('myApp.services.myMessage', ['firebase', 'firebase.utils', 'fireb
                 },
                 markStatus: function (componentId, messageId, status, statusValue) {
                     //statusValue is optionalArg
+                    var statusStr;
                     statusValue = (typeof statusValue === "undefined")
                         ? "defaultValue" : statusValue;
                     if (componentId === 'E0001') {
                         statusStr = 'data/' + status;
+                    } else {
+                        statusStr = status;
                     }
+
                     var obj = syncObject([MessageRefStr, componentId, messageId, statusStr]);
 
                     if (statusValue === "defaultValue") {

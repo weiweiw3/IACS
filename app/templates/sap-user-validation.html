@@ -31,17 +31,11 @@
                     <div class="input-label">
                         Language
                     </div>
-                    {{preflang}}
-                    <select name='options' ng-model="preflang"
-                            ng-options="language as language.name for language in languages">
+                    <select name='options'
+                            ng-change="changedValue(preflang)" ng-model="preflang"
+                            ng-options="language.$id as language.$value for language in languages">
                     </select>
-
                 </label>
-
-                <p>selected item is : {{selectedItem}}</p>
-                <select ng-model="selectedItem">
-                    <option ng-repeat="item in languages" value="{{item.value}}">{{item.name}}</option>
-                </select>
             </div>
             <button ng-show="validation.username.$error.required"
                     class="button button-clear button-assertive">
@@ -55,13 +49,14 @@
                     class="button button-clear button-assertive">
                 username is too short
             </button>
+
+            <button class="button button-block button-positive" type="submit">{{ buttontext }}</button>
             <div class="list">
                 <a ng-repeat="(key,value) in model.last" class="item">
                     {{ key+': '+value }}
                 </a>
                 <span class="item-note" am-time-ago="message.last.date"></span>
             </div>
-            <button class="button button-block button-positive" type="submit">{{ model.buttontext }}</button>
         </form>
 
     </ion-content>

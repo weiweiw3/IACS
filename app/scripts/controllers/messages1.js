@@ -27,7 +27,6 @@ angular.module('myApp.controllers.messages1', [])
     })
 
 
-
     .controller("SampleCtrl", ["$scope", "$timeout", function ($scope, $timeout) {
         // create a Firebase reference
         var ref = new $window.Firebase("https://<your-firebase>.firebaseio.com/foo");

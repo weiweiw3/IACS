@@ -26,13 +26,26 @@ angular.module('myApp.controllers.messagesInOneComponent', [])
         });
 
 
-        $scope.goDetail = function (key, read) {
+        $scope.goDetail = function (key, read, origin) {
             messageId = key;
             if (!read) {
                 myMessage.markStatus(componentId, messageId, 'read', true)
             }
-            navigate(componentId, messageId);
+            if (componentId === 'E0002') {
+                ionicLoading.load();
+                if (origin) {
+                    ionicLoading.unload();
+                    navigate(componentId, messageId);
+                }
+                else {
+                    console.log(messageId + 'has been deleted');
+                    ionicLoading.unload();
+                }
+            }
+            if (componentId === 'E0001') {
 
+                navigate(componentId, messageId);
+            }
 
         };
         function navigate(componentId, messageId) {
