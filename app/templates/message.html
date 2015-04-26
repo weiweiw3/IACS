@@ -1,6 +1,7 @@
 <div>
     <div class="bar bar-header">
-        <a class="button icon ion-navicon" href="#/message/{{message.component}}"> </a>
+
+        <a class="button icon ion-arrow-left-c" href="#/message/{{message.component}}"> </a>
 
         <h1 class="title">{{ message.id }}</h1>
         <button favorite-message
@@ -30,15 +31,36 @@
                 Header
             </div>
             <a ng-repeat="(key,value) in message.metadata" class="item">
-                {{ key+': '+value }}
+                {{key+':'+ value}}
             </a>
+
+            <a ng-click="goDetail()" class="item">
+                <div class="row">
+                    ->more data ...
+                </div>
+            </a>
+
         </div>
         <div class="list" ng-controller="messageItemCtrl">
             <div class="item item-divider">
                 Items
+
             </div>
-            <a ng-repeat="data in syncedItemStart" class="item">
-                {{ data }}
+            <a ng-repeat="data in syncedItemStart" class="item"
+               ng-click="goDetail(data)"
+                    >
+
+                <div class="row">
+                    <div class="col">{{ data.po_ITEM}}</div>
+                    <div class="col">{{ data.pur_MAT}}</div>
+                    <div class="col">{{ data.net_PRICE}}</div>
+                    <div class="col">{{ data.disp_QUAN}}</div>
+                </div>
+                <div class="row">
+                    {{ data.short_TEXT}}
+
+                </div>
+
             </a>
             <button ng-hide="isloaded" class="button button-full button-stable" ng-click="loadingMore()">
                 {{ loadText }}

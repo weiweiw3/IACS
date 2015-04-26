@@ -26,6 +26,7 @@ var myAppComponents = [
     'myApp.controllers.messagesInOneComponent',
     'myApp.controllers.messagesDetail',
     'myApp.controllers.messages1',
+    'myApp.controllers.material',
     'myApp.services.ionic',
     'myApp.services',
     'myApp.services.auth',

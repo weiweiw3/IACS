@@ -72,25 +72,31 @@ angular.module('myApp.routes', ['firebase.simpleLogin' ])
                     controller: 'messageHeaderCtrl'
 
                 })
+
+                .state('material', {
+                    url: '/material',
+                    templateUrl: 'templates/material.html',
+                    controller: 'materialCtrl'
+                })
                 .state('components-management', {
                     url: '/components-management',
                     templateUrl: 'templates/components-management.html'
 
                 })
                 // the contacts tab has its own child nav-view and history
-                .state('tab.contacts', {
-                    url: '/contacts',
-                    views: {
-                        'contacts-tab': {
-                            templateUrl: 'templates/contacts.html'
-                        }
-                    }
-                })
+//                .state('tab.contacts', {
+//                    url: '/contacts',
+//                    views: {
+//                        'contacts-tab': {
+//                            templateUrl: 'templates/contacts.html'
+//                        }
+//                    }
+//                })
 
-                .state('contacts-detail', {
-                    url: '/contacts/:contactId',
-                    templateUrl: 'templates/contact-detail.html'
-                })
+//                .state('contacts-detail', {
+//                    url: '/contacts/:contactId',
+//                    templateUrl: 'templates/contact-detail.html'
+//                })
 
                 // the components tab has its own child nav-view and history
 //                .state('tab.components', {

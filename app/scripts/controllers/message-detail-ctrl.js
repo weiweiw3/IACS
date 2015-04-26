@@ -53,6 +53,20 @@ angular.module('myApp.controllers.messagesDetail', [])
             console.log(ctrlName, 'is no longer necessary');
         });
 
+        $scope.goDetail = function () {
+            //data is PurchaseOrderdata
+            var title = 'Purchase Order ' + messageId + ' Head Information';
+
+            var string = $location.url();
+            string = string.substring(1);//把URL里的第一位"/"去掉
+
+            $location.path('/material').search({
+                'back_url': string,
+                'ref': $scope.message.HeadRef,
+                'title': title
+            });
+        };
+
     })
 
     .controller('messageItemCtrl',
@@ -66,7 +80,19 @@ angular.module('myApp.controllers.messagesDetail', [])
             .then(ionicLoading.unload());
 
         $scope.isloaded = false;
+        $scope.goDetail = function (data) {
+            //data is PurchaseOrderItemdata
+            var title = data.po_ITEM;
 
+            var string = $location.url();
+            string = string.substring(1);//把URL里的第一位"/"去掉
+
+            $location.path('/material').search({
+                'back_url': string,
+                'ref': data.Ref,
+                'title': title
+            });
+        };
         $scope.loadText = 'more items';
 
         $scope.loadingMore = function () {
